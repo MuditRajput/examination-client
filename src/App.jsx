@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Switch, Redirect } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/client';
 import { AuthRoute, PrivateRoute } from './routes';
 import {
-  ChildrenDemo, TextFieldDemo, InputDemo, LoginUi, NoMatch, TraineeDetail, TraineeList,
+  ChildrenDemo, TextFieldDemo, InputDemo, LoginUi, NoMatch, TraineeDetail, TraineeList, Examination,
 } from './pages';
 import theme from './theme';
 import { SnackBarProvider } from './contexts';
@@ -20,6 +20,7 @@ function App() {
             <Switch>
               <Redirect exact path="/" to="/trainee" />
               <AuthRoute exact path="/login" component={LoginUi} />
+              <PrivateRoute exact path="/exam" component={Examination} />
               <PrivateRoute exact path="/trainee" component={TraineeList} />
               <PrivateRoute exact path="/trainee/:id" component={TraineeDetail} />
               <PrivateRoute exact path="/input-demo" component={InputDemo} />

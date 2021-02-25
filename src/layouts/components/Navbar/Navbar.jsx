@@ -29,6 +29,9 @@ const NavBar = (props) => {
           <Typography variant="h6" className={classes.title}>
             Trainee Portal
           </Typography>
+          <NavLink to="/exam">
+            <Button className={classes.menuButton}>EXAMINATION</Button>
+          </NavLink>
           <NavLink to="/trainee">
             <Button className={classes.menuButton}>TRAINEE</Button>
           </NavLink>
