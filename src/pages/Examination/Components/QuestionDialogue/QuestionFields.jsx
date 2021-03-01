@@ -2,7 +2,9 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   TextField, Button, Dialog, makeStyles, DialogContent, DialogActions,
+  DialogTitle,
 } from '@material-ui/core';
+import * as yup from 'yup';
 
 export const useStyle = makeStyles(() => ({
   margin: {
@@ -19,10 +21,35 @@ const QuestionField = (props) => {
 
   const [options, setOptions] = useState({});
 
-  const handleBlur = (label) => {
-    setBlur({ ...onBlur, [label]: true });
+  const [schemaErrors, setSchemaErrors] = useState({});
+
+  // validation
+  const schema = yup.object().shape({
+    question: yup.string().required('question is required').min(3, 'should have more then 3 characters'),
+    correct: yup.string().required('correct option is required'),
+  });
+
+  const handleErrors = (errors) => {
+    const schemaError = {};
+    if (Object.keys(errors).length) {
+      errors.inner.forEach((error) => {
+        schemaError[error.path] = error.message;
+      });
+    }
+    setSchemaErrors(schemaError);
   };
 
+  const handleValidate = () => {
+    schema.validate(question, { abortEarly: false })
+      .then(() => { handleErrors({}); })
+      .catch((err) => { handleErrors(err); });
+  };
+
+  const hasErrors = () => Object.keys(schemaErrors).length !== 0;
+
+  const isTouched = () => Object.keys(onBlur).length !== 0;
+
+  // Handlers
   const handleClose = () => {
     onClose();
     setOptions({});
@@ -36,6 +63,13 @@ const QuestionField = (props) => {
     handleClose();
   };
 
+  const getError = (label) => {
+    if (onBlur[label]) {
+      return schemaErrors[label] || '';
+    }
+    return '';
+  };
+
   const handleOptionField = (label, input) => {
     setOptions({ ...options, [label]: input.target.value });
   };
@@ -44,6 +78,10 @@ const QuestionField = (props) => {
     setQuestion({
       ...question, [label]: input.target.value,
     });
+  };
+  const handleBlur = (label) => {
+    handleValidate();
+    setBlur({ ...onBlur, [label]: true });
   };
 
   useEffect(() => {
@@ -61,11 +99,15 @@ const QuestionField = (props) => {
       maxWidth="md"
     >
       <DialogContent>
-
+        <DialogTitle>
+          Add Question
+        </DialogTitle>
         <TextField
           size="small"
           fullWidth
           className={classes.margin}
+          error={!!getError('subject')}
+          helperText={getError('subject')}
           onChange={(input) => handleQuestionField('question', input)}
           onBlur={() => { handleBlur('question'); }}
           label="Question"
@@ -117,7 +159,7 @@ const QuestionField = (props) => {
         <Button autoFocus onClick={handleClose} color="secondary">
           Close
         </Button>
-        <Button autoFocus onClick={handleAddQuestion} color="primary">
+        <Button disabled={hasErrors() || !isTouched()} onClick={handleAddQuestion} color="primary">
           Add Question
         </Button>
       </DialogActions>

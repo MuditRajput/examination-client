@@ -5,7 +5,7 @@ import {
   DialogTitle, Button, TextField, makeStyles,
 } from '@material-ui/core';
 import * as yup from 'yup';
-import QuestionField from './QuestionFields';
+import { QuestionField } from '../QuestionDialogue';
 
 export const useStyle = makeStyles(() => ({
   margin: {
@@ -21,7 +21,6 @@ const AddExamination = (props) => {
   const schema = yup.object().shape({
     subject: yup.string().required('Subject is required').min(3, 'should have more then 3 characters'),
     description: yup.string(),
-    number: yup.number('Must be a Number').required('Number of Questions is required'),
   });
 
   const [openQuestion, setOpenQuestion] = useState(false);
@@ -86,7 +85,7 @@ const AddExamination = (props) => {
   const handleOnSubmit = () => {
     onSubmit(state);
     setstate({
-      subject: '', description: '', number: 0,
+      subject: '', description: '',
     });
     setBlur({});
   };
