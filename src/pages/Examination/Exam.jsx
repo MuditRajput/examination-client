@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  FormControl, FormLabel, RadioGroup, FormControlLabel, Radio,
+  FormControl, RadioGroup, FormControlLabel, Radio, Container, Typography,
 } from '@material-ui/core';
 
 const Exam = () => {
@@ -51,20 +51,26 @@ const Exam = () => {
   ];
 
   return (
-    <>
+    <Container>
       {
         data.map((questionDetail) => (
-          <>
-            <FormControl component="fieldset">
-              <FormLabel component="legend">{questionDetail.question}</FormLabel>
-              <RadioGroup aria-label="answer" name="gender1">
-                <FormControlLabel value={questionDetail} control={<Radio />} label="Female" />
+          <div style={{ marginBottom: '25px' }}>
+            <FormControl>
+              <Typography variant="h6">
+                {questionDetail.question}
+              </Typography>
+              <RadioGroup aria-label="answer" name="solution">
+                {
+                  questionDetail.options.map((option) => (
+                    <FormControlLabel value={option} control={<Radio color="primary" />} label={option} />
+                  ))
+                }
               </RadioGroup>
             </FormControl>
-          </>
+          </div>
         ))
       }
-    </>
+    </Container>
   );
 };
 
