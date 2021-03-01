@@ -10,20 +10,21 @@ import { DeleteExamination } from './Components/DeleteDialogue';
 
 const Examination = (props) => {
   const { history, match } = props;
-  const handleSelect = (property) => {
-    history.push(`${match.path}/${property}`);
-  };
-
   const [open, setOpen] = useState(false);
-
   const [deleteOpen, setDeleteOpen] = useState(false);
-
   const [editOpen, setEditOpen] = useState(false);
-
+  const [page, setPage] = useState(0);
   const [details, setDetails] = useState({});
+  const [order, setOrder] = useState();
+  const [orderBy, setOrderBy] = useState();
 
   const handleOpenAddExamination = () => {
     setOpen(!open);
+  };
+
+  const handleAddExaminationSubmit = (examinationdetails) => {
+    console.log(examinationdetails);
+    setOpen(false);
   };
 
   const handleEditDialogOpen = (examDetails) => {
@@ -40,6 +41,10 @@ const Examination = (props) => {
     setDeleteOpen(false);
   };
 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
   const handleDeleteDialogSubmit = () => {
     setDeleteOpen(false);
     console.log(details);
@@ -54,18 +59,30 @@ const Examination = (props) => {
     console.log(editedDetails);
   };
 
+  const handleSort = (property) => {
+    setOrder(order === 'asc' && orderBy === property ? 'desc' : 'asc');
+    setOrderBy(property);
+  };
+
+  const handleSelect = (property) => {
+    history.push(`${match.path}/${property}`);
+  };
+
   const data = [
     {
       subject: 'physics',
       originalId: '602defed287cf212e8bb3810',
+      description: 'Physics Exam for 11th class students',
     },
     {
       subject: 'physics',
       originalId: '602e47374547b575c3d12e00',
+      description: 'Physics Exam for 12th class students',
     },
     {
       subject: 'chemistry',
       originalId: '602e5e3a157ce60417fadf33',
+      description: 'Chemistry Exam for 11th class students',
     },
   ];
   return (
@@ -97,10 +114,14 @@ const Examination = (props) => {
           },
         ]}
         onSelect={handleSelect}
+        onSort={handleSort}
+        onChangePage={handleChangePage}
+        page={page}
       />
       <AddExamination
         open={open}
         onClose={handleOpenAddExamination}
+        onSubmit={handleAddExaminationSubmit}
       />
       <EditExamination
         open={editOpen}
