@@ -13,7 +13,7 @@ export const useStyle = makeStyles(() => ({
 
 const AddQuestions = (props) => {
   const { match } = props;
-  console.log(match.path);
+  console.log(match.params.id);
   const [question, setQuestion] = useState({});
 
   const [onBlur, setBlur] = useState({});
@@ -27,6 +27,7 @@ const AddQuestions = (props) => {
     question: yup.string().required('question is required').min(3, 'should have more then 3 characters'),
     correct: yup.string().required('correct option is required'),
   });
+  console.log(schemaErrors);
 
   const handleErrors = (errors) => {
     const schemaError = {};
@@ -97,8 +98,8 @@ const AddQuestions = (props) => {
         size="small"
         fullWidth
         className={classes.margin}
-        error={!!getError('subject')}
-        helperText={getError('subject')}
+        error={!!getError('question')}
+        helperText={getError('question')}
         onChange={(input) => handleQuestionField('question', input)}
         onBlur={() => { handleBlur('question'); }}
         label="Question"
@@ -108,6 +109,8 @@ const AddQuestions = (props) => {
         size="small"
         fullWidth
         className={classes.margin}
+        error={!!getError('correct')}
+        helperText={getError('correct')}
         onChange={(input) => handleQuestionField('correct', input)}
         onBlur={() => handleBlur('correct')}
         label="Correct Option"
@@ -115,7 +118,6 @@ const AddQuestions = (props) => {
       />
       <TextField
         size="small"
-        fullWidth
         className={classes.margin}
         onChange={(input) => handleOptionField('option1', input)}
         label="Option"
@@ -123,7 +125,6 @@ const AddQuestions = (props) => {
       />
       <TextField
         size="small"
-        fullWidth
         className={classes.margin}
         onChange={(input) => handleOptionField('option2', input)}
         label="Option"
@@ -131,7 +132,6 @@ const AddQuestions = (props) => {
       />
       <TextField
         size="small"
-        fullWidth
         className={classes.margin}
         onChange={(input) => handleOptionField('option3', input)}
         label="Option"
@@ -139,7 +139,6 @@ const AddQuestions = (props) => {
       />
       <TextField
         size="small"
-        fullWidth
         className={classes.margin}
         onChange={(input) => handleOptionField('option4', input)}
         label="Option"
