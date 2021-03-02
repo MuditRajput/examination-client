@@ -1,1 +1,1 @@
-export { default as DeleteExamination } from './DeleteDialogue';
+export { default as DeleteDialog } from './DeleteDialogue';

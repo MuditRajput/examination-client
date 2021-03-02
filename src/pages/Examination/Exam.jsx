@@ -1,10 +1,52 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
-  FormControl, RadioGroup, FormControlLabel, Radio, Container, Typography,
+  RadioGroup, FormControlLabel, Radio, Container, Typography, makeStyles, IconButton,
+  Paper,
 } from '@material-ui/core';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import { EditQuestion } from './Components/EditQuestion';
+import { DeleteDialog } from './Components/DeleteDialogue';
+
+const useStyles = makeStyles((theme) => ({
+  question: {
+    marginBottom: theme.spacing(3),
+    padding: theme.spacing(2),
+  },
+  options: {
+    marginLeft: theme.spacing(2),
+  },
+}));
 
 const Exam = () => {
-  console.log('Inside Exam');
+  const classes = useStyles();
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [details, setDetails] = useState({});
+  const handleEdit = (questionDetails) => {
+    setEditOpen(true);
+    setDetails(questionDetails);
+  };
+
+  const handleEditClose = () => {
+    setEditOpen(false);
+  };
+
+  const handleEditSubmit = (newDetails) => {
+    setEditOpen(false);
+    console.log(newDetails);
+  };
+
+  const deleteOpenAndClose = (questionDetails) => {
+    setDetails(questionDetails);
+    setDeleteOpen(!deleteOpen);
+  };
+
+  const handleDelete = () => {
+    setDeleteOpen(false);
+    console.log(details);
+  };
+
   const data = [{
     options: [
       'Gas only',
@@ -54,22 +96,39 @@ const Exam = () => {
     <Container>
       {
         data.map((questionDetail) => (
-          <div style={{ marginBottom: '25px' }}>
-            <FormControl>
-              <Typography variant="h6">
-                {questionDetail.question}
-              </Typography>
-              <RadioGroup aria-label="answer" name="solution">
-                {
-                  questionDetail.options.map((option) => (
-                    <FormControlLabel value={option} control={<Radio color="primary" />} label={option} />
-                  ))
-                }
-              </RadioGroup>
-            </FormControl>
-          </div>
+          <Paper key={questionDetail.originalId} className={classes.question}>
+            <Typography variant="h6">
+              {questionDetail.question}
+            </Typography>
+            <Typography align="right">
+              <IconButton disableFocusRipple size="small" onClick={() => handleEdit(questionDetail)}>
+                <EditIcon />
+              </IconButton>
+              <IconButton disableFocusRipple size="small" onClick={() => deleteOpenAndClose(questionDetail)}>
+                <DeleteIcon />
+              </IconButton>
+            </Typography>
+            <RadioGroup className={classes.options} aria-label="answer" name="solution">
+              {
+                questionDetail.options.map((option) => (
+                  <FormControlLabel key={option} value={option} control={<Radio color="primary" />} label={option} />
+                ))
+              }
+            </RadioGroup>
+          </Paper>
         ))
       }
+      <EditQuestion
+        open={editOpen}
+        defaultValues={details}
+        onSubmit={handleEditSubmit}
+        onClose={handleEditClose}
+      />
+      <DeleteDialog
+        open={deleteOpen}
+        onClose={deleteOpenAndClose}
+        onDelete={handleDelete}
+      />
     </Container>
   );
 };

@@ -11,9 +11,9 @@ export const useStyle = makeStyles(() => ({
   },
 }));
 
-const DeleteExaminatrion = (props) => {
+const DeleteDialog = (props) => {
   const {
-    open, onClose, onDelete, loading,
+    open, onClose, onDelete, loading, text,
   } = props;
   const classes = useStyle();
 
@@ -25,11 +25,11 @@ const DeleteExaminatrion = (props) => {
       maxWidth="md"
     >
       <DialogTitle>
-        Delete Trainee
+        {text}
       </DialogTitle>
       <DialogContent>
         <DialogContentText fontSize={16}>
-          Do you really want to delete Exam.
+          Do you really want to delete.
         </DialogContentText>
       </DialogContent>
       <DialogActions className={classes.margin}>
@@ -45,16 +45,18 @@ const DeleteExaminatrion = (props) => {
   );
 };
 
-DeleteExaminatrion.propTypes = {
+DeleteDialog.propTypes = {
   open: PropTypes.bool,
   onClose: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   loading: PropTypes.bool,
+  text: PropTypes.string,
 };
 
-DeleteExaminatrion.defaultProps = {
+DeleteDialog.defaultProps = {
   open: false,
   loading: false,
+  text: 'Comfirm Delete',
 };
 
-export default DeleteExaminatrion;
+export default DeleteDialog;

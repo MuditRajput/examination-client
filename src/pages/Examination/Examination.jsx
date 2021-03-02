@@ -6,7 +6,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import { TableComponent } from '../../components';
 import { AddExamination } from './Components/AddDialogue';
 import { EditExamination } from './Components/EditDialogue';
-import { DeleteExamination } from './Components/DeleteDialogue';
+import { DeleteDialog } from './Components/DeleteDialogue';
 
 const Examination = (props) => {
   const { history, match } = props;
@@ -129,7 +129,7 @@ const Examination = (props) => {
         onClose={handleEditDialogClose}
         onSubmit={handleEditDialogSubmit}
       />
-      <DeleteExamination
+      <DeleteDialog
         open={deleteOpen}
         onClose={handleDeleteDialogClose}
         onDelete={handleDeleteDialogSubmit}

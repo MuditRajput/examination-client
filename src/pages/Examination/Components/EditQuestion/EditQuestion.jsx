@@ -12,10 +12,11 @@ export const useStyle = makeStyles(() => ({
   },
 }));
 
-const QuestionField = (props) => {
+const EditQuestion = (props) => {
   const {
-    onSubmit, open, onClose,
+    onSubmit, open, onClose, defaultValues,
   } = props;
+  const { options: defaultOptions = [], question: defaultQuestion, correctOption } = defaultValues;
 
   const [question, setQuestion] = useState({});
 
@@ -59,8 +60,6 @@ const QuestionField = (props) => {
   };
 
   const handleAddQuestion = () => {
-    console.log(Object.values(options));
-    console.log(question, 'check');
     onSubmit(question);
     handleClose();
   };
@@ -76,7 +75,7 @@ const QuestionField = (props) => {
     setOptions({ ...options, [label]: input.target.value });
   };
 
-  const handleQuestionField = (label, input) => {
+  const handleEditQuestion = (label, input) => {
     setQuestion({
       ...question, [label]: input.target.value,
     });
@@ -102,15 +101,16 @@ const QuestionField = (props) => {
     >
       <DialogContent>
         <DialogTitle>
-          Add Question
+          Edit Question
         </DialogTitle>
         <TextField
           size="small"
           fullWidth
           className={classes.margin}
+          defaultValue={defaultQuestion}
           error={!!getError('subject')}
           helperText={getError('subject')}
-          onChange={(input) => handleQuestionField('question', input)}
+          onChange={(input) => handleEditQuestion('question', input)}
           onBlur={() => { handleBlur('question'); }}
           label="Question"
           variant="outlined"
@@ -119,43 +119,26 @@ const QuestionField = (props) => {
           size="small"
           fullWidth
           className={classes.margin}
-          onChange={(input) => handleQuestionField('correct', input)}
+          defaultValue={correctOption}
+          onChange={(input) => handleEditQuestion('correct', input)}
           onBlur={() => handleBlur('correct')}
           label="Correct Option"
           variant="outlined"
         />
-        <TextField
-          size="small"
-          fullWidth
-          className={classes.margin}
-          onChange={(input) => handleOptionField('option1', input)}
-          label="Option"
-          variant="outlined"
-        />
-        <TextField
-          size="small"
-          fullWidth
-          className={classes.margin}
-          onChange={(input) => handleOptionField('option2', input)}
-          label="Option"
-          variant="outlined"
-        />
-        <TextField
-          size="small"
-          fullWidth
-          className={classes.margin}
-          onChange={(input) => handleOptionField('option3', input)}
-          label="Option"
-          variant="outlined"
-        />
-        <TextField
-          size="small"
-          fullWidth
-          className={classes.margin}
-          onChange={(input) => handleOptionField('option4', input)}
-          label="Option"
-          variant="outlined"
-        />
+        {
+          defaultOptions.map((option, index) => (
+            <TextField
+              key={option}
+              size="small"
+              fullWidth
+              defaultValue={option}
+              className={classes.margin}
+              onChange={(input) => handleOptionField(`option${index + 1}`, input)}
+              label="Option"
+              variant="outlined"
+            />
+          ))
+        }
       </DialogContent>
       <DialogActions>
         <Button autoFocus onClick={handleClose} color="secondary">
@@ -169,14 +152,16 @@ const QuestionField = (props) => {
   );
 };
 
-QuestionField.propTypes = {
+EditQuestion.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
   open: PropTypes.bool,
+  defaultValues: PropTypes.object,
 };
 
-QuestionField.defaultProps = {
+EditQuestion.defaultProps = {
   open: false,
+  defaultValues: {},
 };
 
-export default QuestionField;
+export default EditQuestion;
