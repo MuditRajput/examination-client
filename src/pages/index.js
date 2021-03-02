@@ -4,4 +4,4 @@ export { ChildrenDemo } from './ChildrenDemo';
 export { TraineeDetail, TraineeList } from './Trainee';
 export { LoginUi } from './Login';
 export { NoMatch } from './NoMatch';
-export { Examination, Exam } from './Examination';
+export { Examination, Exam, AddQuestion } from './Examination';

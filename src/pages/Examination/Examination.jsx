@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Button } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
+import AddIcon from '@material-ui/icons/Add';
 import { TableComponent } from '../../components';
 import { AddExamination } from './Components/AddDialogue';
 import { EditExamination } from './Components/EditDialogue';
@@ -68,6 +69,10 @@ const Examination = (props) => {
     history.push(`${match.path}/${property}`);
   };
 
+  const handleAddQuestions = (questionDetails) => {
+    history.push(`${match.path}/add/${questionDetails.originalId}`);
+  };
+
   const data = [
     {
       subject: 'physics',
@@ -111,6 +116,10 @@ const Examination = (props) => {
           {
             icon: <DeleteIcon />,
             handler: handleDeleteDialogOpen,
+          },
+          {
+            icon: <AddIcon fontSize="large" />,
+            handler: handleAddQuestions,
           },
         ]}
         onSelect={handleSelect}
