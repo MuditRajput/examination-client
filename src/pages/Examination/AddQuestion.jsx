@@ -5,6 +5,7 @@ import {
 } from '@material-ui/core';
 import * as yup from 'yup';
 import { Form, Field } from 'react-final-form';
+import { ConfirmDialog } from './Components/ConfirmDialog';
 
 export const useStyle = makeStyles(() => ({
   margin: {
@@ -15,18 +16,15 @@ export const useStyle = makeStyles(() => ({
   },
 }));
 
-const AddQuestions = () => {
+const AddQuestions = (props) => {
+  const { match, history } = props;
   const [onBlur, setBlur] = useState({});
-
-  const [state, setState] = useState([]);
-
   const [inputArray, setInputArray] = useState([1]);
-
   const [optionInputArray, setOptionInputArray] = useState([1, 1]);
-
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const [schemaErrors, setSchemaErrors] = useState({});
+  const [state, setState] = useState({});
 
-  // validation
   const schema = yup.object().shape({
     question: yup.string().required('question is required').min(3, 'should have more then 3 characters'),
     correct: yup.string().required('correct option is required'),
@@ -42,8 +40,8 @@ const AddQuestions = () => {
     setSchemaErrors(schemaError);
   };
 
-  const handleValidate = () => {
-    state.forEach((question) => {
+  const handleValidate = (questions) => {
+    questions.forEach((question) => {
       schema.validate(question, { abortEarly: false })
         .then(() => { handleErrors({}); })
         .catch((err) => { handleErrors(err); });
@@ -52,11 +50,19 @@ const AddQuestions = () => {
 
   const hasErrors = () => Object.keys(schemaErrors).length !== 0;
 
-  const isTouched = () => Object.keys(onBlur).length !== 0;
+  const isTouched = () => Object.keys(onBlur).length >= 2;
 
-  // Handlers
-  const handleAddQuestion = () => {
-    console.log(state);
+  const submitQuestions = () => {
+    setConfirmOpen(false);
+    if (!hasErrors()) {
+      console.log('id', match.params.id);
+      console.log(state);
+      history.push('/exam');
+    }
+  };
+
+  const handleConfirmClose = () => {
+    setConfirmOpen(false);
   };
 
   const getError = (label) => {
@@ -67,19 +73,23 @@ const AddQuestions = () => {
   };
 
   const handleBlur = (label) => {
-    handleValidate();
     setBlur({ ...onBlur, [label]: true });
   };
 
   const handleSubmitQuestion = (values) => {
+    console.log(values);
     const questionList = [];
-    inputArray.forEach((index) => {
-      const options = optionInputArray.map((value, optionIndex) => {
-        console.log(values[`option${index - 1}${optionIndex}`]);
-        return values[`option${index - 1}${optionIndex}`];
+    inputArray.forEach((val, index) => {
+      const options = [];
+      optionInputArray.forEach((value, optionIndex) => {
+        if (values[`option${index}${optionIndex}`]) {
+          options.push(values[`option${index}${optionIndex}`]);
+        }
       });
-      questionList.push({ question: values[`question${index - 1}`], correct: values[`correct${index - 1}`], options });
+      questionList.push({ question: values[`question${index}`], correct: values[`correct${index}`], options });
     });
+    handleValidate(questionList);
+    setConfirmOpen(true);
     setState(questionList);
   };
 
@@ -89,76 +99,88 @@ const AddQuestions = () => {
       <Form
         onSubmit={handleSubmitQuestion}
         render={({ handleSubmit }) => (
-          inputArray.map((value, index) => (
-            <form key={`${value}${index + 1}`} onSubmit={handleSubmit}>
-              <Field
-                name={`question${index}`}
-                render={({ input }) => (
-                  <TextField
-                    size="small"
-                    {...input}
-                    fullWidth
-                    className={classes.margin}
-                    error={!!getError('question')}
-                    helperText={getError('question')}
-                    onBlur={() => handleBlur('question')}
-                    label="Question"
-                    variant="outlined"
-                  />
-                )}
-              />
-              <Field
-                name={`correct${index}`}
-                render={({ input }) => (
-                  <TextField
-                    size="small"
-                    {...input}
-                    fullWidth
-                    className={classes.margin}
-                    error={!!getError('correct')}
-                    helperText={getError('correct')}
-                    onBlur={() => handleBlur('correct')}
-                    label="Correct Option"
-                    variant="outlined"
-                  />
-                )}
-              />
-              {
-                optionInputArray.map((arrayValue, optionIndex) => (
+          <form onSubmit={handleSubmit}>
+            {
+              inputArray.map((value, index) => (
+                <>
                   <Field
-                    key={`${optionIndex + 1}`}
-                    name={`option${index}${optionIndex}`}
+                    name={`question${index}`}
                     render={({ input }) => (
                       <TextField
-                        {...input}
                         size="small"
+                        {...input}
+                        fullWidth
                         className={classes.margin}
-                        label="Option"
+                        error={!!getError('question')}
+                        helperText={getError('question')}
+                        onBlur={() => handleBlur('question')}
+                        label="Question"
                         variant="outlined"
                       />
                     )}
                   />
-                ))
-              }
-              <Button type="submit" className={classes.buttons} variant="contained" disabled={hasErrors() || !isTouched()} onClick={handleAddQuestion} color="primary">
-                Submit
+                  <Field
+                    name={`correct${index}`}
+                    render={({ input }) => (
+                      <TextField
+                        size="small"
+                        {...input}
+                        fullWidth
+                        className={classes.margin}
+                        error={!!getError('correct')}
+                        helperText={getError('correct')}
+                        onBlur={() => handleBlur('correct')}
+                        label="Correct Option"
+                        variant="outlined"
+                      />
+                    )}
+                  />
+                  {
+                    optionInputArray.map((arrayValue, optionIndex) => (
+                      <Field
+                        key={`${optionIndex + 1}`}
+                        name={`option${index}${optionIndex}`}
+                        render={({ input }) => (
+                          <TextField
+                            {...input}
+                            size="small"
+                            className={classes.margin}
+                            label="Option"
+                            variant="outlined"
+                          />
+                        )}
+                      />
+                    ))
+                  }
+                </>
+              ))
+            }
+            <div>
+              <Button className={classes.buttons} variant="outlined" onClick={() => setOptionInputArray([...optionInputArray, 1])} color="secondary">
+                Add More Option Fields
               </Button>
-            </form>
-          ))
+              <Button className={classes.buttons} variant="outlined" onClick={() => setInputArray([...inputArray, 1])} color="secondary">
+                Add Question
+              </Button>
+            </div>
+            <Button fullWidth type="submit" className={classes.buttons} variant="contained" disabled={!isTouched()} color="primary">
+              Submit
+            </Button>
+          </form>
         )}
       />
-      <Button className={classes.buttons} variant="contained" onClick={() => setOptionInputArray([...optionInputArray, 1, 1])} color="primary">
-        Add More Option Fields
-      </Button>
-      <Button className={classes.buttons} variant="contained" onClick={() => setInputArray([...inputArray, 1])} color="primary">
-        Add Question
-      </Button>
+      <ConfirmDialog
+        open={confirmOpen}
+        onSubmit={submitQuestions}
+        onClose={handleConfirmClose}
+      />
     </>
   );
 };
 
 AddQuestions.propTypes = {
   match: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired,
 };
 
 export default AddQuestions;

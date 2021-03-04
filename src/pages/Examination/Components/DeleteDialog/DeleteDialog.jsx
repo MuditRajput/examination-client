@@ -56,7 +56,7 @@ DeleteDialog.propTypes = {
 DeleteDialog.defaultProps = {
   open: false,
   loading: false,
-  text: 'Comfirm Delete',
+  text: 'Confirm Delete',
 };
 
 export default DeleteDialog;

@@ -5,7 +5,6 @@ import {
   DialogTitle, Button, TextField, makeStyles,
 } from '@material-ui/core';
 import * as yup from 'yup';
-import { QuestionField } from '../QuestionDialogue';
 
 export const useStyle = makeStyles(() => ({
   margin: {
@@ -21,14 +20,11 @@ const AddExamination = (props) => {
   const schema = yup.object().shape({
     subject: yup.string().required('Subject is required').min(3, 'should have more then 3 characters'),
     description: yup.string(),
+    maximum: yup.number(),
   });
 
-  const [openQuestion, setOpenQuestion] = useState(false);
-
-  const [questionList, setQuestionList] = useState([]);
-
   const [state, setstate] = useState({
-    subject: '', description: '',
+    subject: '', description: '', maximum: '',
   });
 
   const [onBlur, setBlur] = useState({});
@@ -63,10 +59,8 @@ const AddExamination = (props) => {
   };
 
   useEffect(() => {
-    console.log(state);
-    console.log(questionList);
     handleValidate();
-  }, [state, questionList]);
+  }, [state]);
 
   const hasErrors = () => Object.keys(schemaErrors).length !== 0;
 
@@ -78,20 +72,20 @@ const AddExamination = (props) => {
     });
   };
 
-  const handleAddQuestion = () => {
-    setOpenQuestion(!openQuestion);
-  };
-
   const handleOnSubmit = () => {
     onSubmit(state);
     setstate({
-      subject: '', description: '',
+      subject: '', description: '', maximum: '',
     });
     setBlur({});
   };
 
-  const handleSubmitQuestion = (question) => {
-    setQuestionList([...questionList, question]);
+  const handleClose = () => {
+    setstate({
+      subject: '', description: '', maximum: '',
+    });
+    setBlur({});
+    onClose();
   };
 
   return (
@@ -132,17 +126,20 @@ const AddExamination = (props) => {
           label="Description"
           variant="outlined"
         />
+        <TextField
+          size="small"
+          fullWidth
+          error={!!getError('maximum')}
+          helperText={getError('maximum')}
+          className={classes.margin}
+          onChange={(input) => handleInputField('maximum', input)}
+          onBlur={() => handleBlur('maximum')}
+          label="Maximum Marks"
+          variant="outlined"
+        />
       </DialogContent>
-      <QuestionField
-        open={openQuestion}
-        onClose={handleAddQuestion}
-        onSubmit={handleSubmitQuestion}
-      />
       <DialogActions className={classes.margin}>
-        <Button autoFocus onClick={handleAddQuestion} color="primary">
-          Add Question
-        </Button>
-        <Button autoFocus onClick={onClose} color="secondary">
+        <Button autoFocus onClick={handleClose} color="secondary">
           Cancel
         </Button>
         <Button disabled={hasErrors() || !isTouched() || loading} onClick={() => handleOnSubmit(state)} color="primary">

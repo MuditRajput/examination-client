@@ -6,7 +6,7 @@ import {
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { EditQuestion } from './Components/EditQuestion';
-import { DeleteDialog } from './Components/DeleteDialogue';
+import { DeleteDialog } from './Components/DeleteDialog';
 
 const useStyles = makeStyles((theme) => ({
   question: {

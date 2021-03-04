@@ -5,9 +5,9 @@ import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import AddIcon from '@material-ui/icons/Add';
 import { TableComponent } from '../../components';
-import { AddExamination } from './Components/AddDialogue';
-import { EditExamination } from './Components/EditDialogue';
-import { DeleteDialog } from './Components/DeleteDialogue';
+import { AddExamination } from './Components/AddDialog';
+import { EditExamination } from './Components/EditDialog';
+import { DeleteDialog } from './Components/DeleteDialog';
 
 const Examination = (props) => {
   const { history, match } = props;
