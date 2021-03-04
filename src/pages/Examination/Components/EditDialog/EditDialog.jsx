@@ -17,15 +17,16 @@ const EditExamination = (props) => {
     open, onClose, onSubmit, defaultValues, loading,
   } = props;
 
-  const { subject, description } = defaultValues;
+  const { subject, description, maximumMarks } = defaultValues;
   const classes = useStyle();
   const schema = yup.object().shape({
     subject: yup.string().required('Subject is required').min(3, 'should have more then 3 characters'),
     description: yup.string(),
+    maximumMarks: yup.number(),
   });
 
   const [state, setstate] = useState({
-    subject: '', description: '',
+    subject, description, maximumMarks,
   });
 
   const [onBlur, setBlur] = useState({});
@@ -76,7 +77,7 @@ const EditExamination = (props) => {
   const handleOnSubmit = () => {
     onSubmit(state);
     setstate({
-      subject: '', description: '',
+      subject: '', description: '', maximumMarks: '',
     });
     setBlur({});
   };
@@ -119,6 +120,18 @@ const EditExamination = (props) => {
           onChange={(input) => handleInputField('description', input)}
           onBlur={() => handleBlur('description')}
           label="Description"
+          variant="outlined"
+        />
+        <TextField
+          size="small"
+          fullWidth
+          defaultValue={maximumMarks}
+          error={!!getError('maximumMarks')}
+          helperText={getError('maximumMarks')}
+          className={classes.margin}
+          onChange={(input) => handleInputField('maximumMarks', input)}
+          onBlur={() => handleBlur('maximumMarks')}
+          label="Maximum Marks"
           variant="outlined"
         />
       </DialogContent>

@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import {
   RadioGroup, FormControlLabel, Radio, Container, Typography, makeStyles, IconButton,
-  Paper,
+  Paper, Button, CircularProgress,
 } from '@material-ui/core';
+import { useQuery } from '@apollo/client';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { EditQuestion } from './Components/EditQuestion';
 import { DeleteDialog } from './Components/DeleteDialog';
+import { GETALL_QUESTIONS } from './query';
 
 const useStyles = makeStyles((theme) => ({
   question: {
@@ -18,11 +21,30 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Exam = () => {
+const Exam = ({ match }) => {
   const classes = useStyles();
   const [editOpen, setEditOpen] = useState(false);
+  const [state, setState] = useState({});
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [details, setDetails] = useState({});
+  const [questions, setQuestions] = useState([]);
+
+  const {
+    data, loading,
+  } = useQuery(GETALL_QUESTIONS, {
+    variables: {
+      id: match.params.id,
+    },
+    fetchPolicy: 'cache-and-network',
+  });
+
+  if (!loading && !questions.length) {
+    if (data.getAllQuestions.data.length) {
+      const { getAllQuestions: { data: questionsList = [] } = {} } = data;
+      setQuestions(questionsList);
+    }
+  }
+
   const handleEdit = (questionDetails) => {
     setEditOpen(true);
     setDetails(questionDetails);
@@ -47,68 +69,52 @@ const Exam = () => {
     console.log(details);
   };
 
-  const data = [{
-    options: [
-      'Gas only',
-      'Liquid only',
-      'Solid only',
-      'Both solid & Liquid',
-    ],
-    _id: '602df0a87d1587135da88000',
-    questionSet: '602defed287cf212e8bb3810',
-    question: "Young's modulus is the property of ?",
-    correctOption: 'Solid only',
-    originalId: '602df0a87d1587135da88000',
-    createdAt: '2021-02-18T04:44:24.651Z',
-  },
-  {
-    options: [
-      'Sitting position',
-      'Standing position',
-      'Lying position',
-      'None of these',
-    ],
-    _id: '602df0a87d1587135da88001',
-    questionSet: '602defed287cf212e8bb3810',
-    question: 'A man presses more weigh on earth at?',
-    correctOption: 'Standing position',
-    originalId: '602df0a87d1587135da88001',
-    createdAt: '2021-02-18T04:44:24.652Z',
-    __v: 0,
-  },
-  {
-    options: [
-      'Concentration',
-      'Size',
-      'Density',
-      'Time',
-    ],
-    _id: '60336ecbdfae445ccb34015c',
-    questionSet: '602defed287cf212e8bb3810',
-    question: "Svedberg's Unit is a unit of ______?",
-    correctOption: 'Time',
-    originalId: '602df0a87d1587135da87fff',
-    createdAt: '2021-02-18T04:44:24.648Z',
-  },
-  ];
+  const handleOptionField = (input, originalId) => {
+    setState({ ...state, [originalId]: input.target.value });
+  };
+
+  const handleSubmit = () => {
+    console.log(state);
+  };
+
+  if (loading) {
+    return (
+      <CircularProgress />
+    );
+  }
+
+  if (!questions.length) {
+    return (
+      <Typography>
+        No Questions
+      </Typography>
+    );
+  }
 
   return (
     <Container>
       {
-        data.map((questionDetail) => (
+        questions.map((questionDetail) => (
           <Paper key={questionDetail.originalId} className={classes.question}>
             <Typography variant="h6">
               {questionDetail.question}
             </Typography>
             <Typography align="right">
-              <IconButton disableFocusRipple size="small" onClick={() => handleEdit(questionDetail)}>
-                <EditIcon />
-              </IconButton>
-              <IconButton disableFocusRipple size="small" onClick={() => deleteOpenAndClose(questionDetail)}>
-                <DeleteIcon />
-              </IconButton>
+              {
+                questionDetail.correctOption
+                && (
+                  <>
+                    <IconButton disableFocusRipple size="small" onClick={() => handleEdit(questionDetail)}>
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton disableFocusRipple size="small" onClick={() => deleteOpenAndClose(questionDetail)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </>
+                )
+              }
             </Typography>
-            <RadioGroup className={classes.options} aria-label="answer" name="solution">
+            <RadioGroup className={classes.options} onChange={(input) => { handleOptionField(input, questionDetail.originalId); }} aria-label="answer" name="solution">
               {
                 questionDetail.options.map((option) => (
                   <FormControlLabel key={option} value={option} control={<Radio color="primary" />} label={option} />
@@ -129,8 +135,15 @@ const Exam = () => {
         onClose={deleteOpenAndClose}
         onDelete={handleDelete}
       />
+      <Button variant="contained" onClick={handleSubmit} color="primary">
+        Submit
+      </Button>
     </Container>
   );
+};
+
+Exam.propTypes = {
+  match: PropTypes.object.isRequired,
 };
 
 export default Exam;

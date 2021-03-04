@@ -20,11 +20,11 @@ const AddExamination = (props) => {
   const schema = yup.object().shape({
     subject: yup.string().required('Subject is required').min(3, 'should have more then 3 characters'),
     description: yup.string(),
-    maximum: yup.number(),
+    maximumMarks: yup.number(),
   });
 
   const [state, setstate] = useState({
-    subject: '', description: '', maximum: '',
+    subject: '', description: '', maximumMarks: '',
   });
 
   const [onBlur, setBlur] = useState({});
@@ -75,14 +75,14 @@ const AddExamination = (props) => {
   const handleOnSubmit = () => {
     onSubmit(state);
     setstate({
-      subject: '', description: '', maximum: '',
+      subject: '', description: '', maximumMarks: 0,
     });
     setBlur({});
   };
 
   const handleClose = () => {
     setstate({
-      subject: '', description: '', maximum: '',
+      subject: '', description: '', maximumMarks: 0,
     });
     setBlur({});
     onClose();
@@ -129,11 +129,11 @@ const AddExamination = (props) => {
         <TextField
           size="small"
           fullWidth
-          error={!!getError('maximum')}
-          helperText={getError('maximum')}
+          error={!!getError('maximumMarks')}
+          helperText={getError('maximumMarks')}
           className={classes.margin}
-          onChange={(input) => handleInputField('maximum', input)}
-          onBlur={() => handleBlur('maximum')}
+          onChange={(input) => handleInputField('maximumMarks', input)}
+          onBlur={() => handleBlur('maximumMarks')}
           label="Maximum Marks"
           variant="outlined"
         />

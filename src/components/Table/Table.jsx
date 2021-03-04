@@ -79,7 +79,7 @@ const TableComponent = (props) => {
           ))}
         </TableBody>
       </Table>
-      <PaginationCell />
+      { !!rowsPerPage && <PaginationCell /> }
     </TableContainer>
   );
 };
@@ -105,7 +105,7 @@ TableComponent.defaultProps = {
   actions: [],
   page: 0,
   count: 0,
-  rowsPerPage: 100,
+  rowsPerPage: 0,
 };
 
 export default TableComponent;

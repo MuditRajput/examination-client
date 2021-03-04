@@ -86,7 +86,7 @@ const AddQuestions = (props) => {
           options.push(values[`option${index}${optionIndex}`]);
         }
       });
-      questionList.push({ question: values[`question${index}`], correct: values[`correct${index}`], options });
+      questionList.push({ question: values[`question${index}`], correctOption: values[`correct${index}`], options });
     });
     handleValidate(questionList);
     setConfirmOpen(true);
