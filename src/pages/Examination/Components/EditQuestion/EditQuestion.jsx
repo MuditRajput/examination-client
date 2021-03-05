@@ -29,7 +29,7 @@ const EditQuestion = (props) => {
   // validation
   const schema = yup.object().shape({
     question: yup.string().required('question is required').min(3, 'should have more then 3 characters'),
-    correct: yup.string().required('correct option is required'),
+    correctOption: yup.string().required('correct option is required'),
   });
 
   const handleErrors = (errors) => {
@@ -59,7 +59,7 @@ const EditQuestion = (props) => {
     setQuestion({});
   };
 
-  const handleAddQuestion = () => {
+  const handleEditSubmit = () => {
     onSubmit(question);
     handleClose();
   };
@@ -86,9 +86,11 @@ const EditQuestion = (props) => {
   };
 
   useEffect(() => {
-    setQuestion({
-      ...question, options: (Object.values(options)),
-    });
+    if (Object.values(options).length) {
+      setQuestion({
+        ...question, options: (Object.values(options)),
+      });
+    }
   }, [options]);
 
   const classes = useStyle();
@@ -120,8 +122,8 @@ const EditQuestion = (props) => {
           fullWidth
           className={classes.margin}
           defaultValue={correctOption}
-          onChange={(input) => handleEditQuestion('correct', input)}
-          onBlur={() => handleBlur('correct')}
+          onChange={(input) => handleEditQuestion('correctOption', input)}
+          onBlur={() => handleBlur('correctOption')}
           label="Correct Option"
           variant="outlined"
         />
@@ -144,8 +146,8 @@ const EditQuestion = (props) => {
         <Button autoFocus onClick={handleClose} color="secondary">
           Close
         </Button>
-        <Button disabled={hasErrors() || !isTouched()} onClick={handleAddQuestion} color="primary">
-          Add Question
+        <Button disabled={hasErrors() || !isTouched()} onClick={handleEditSubmit} color="primary">
+          Submit
         </Button>
       </DialogActions>
     </Dialog>

@@ -36,3 +36,49 @@ export const DELETE_EXAMINATION = gql`
   }
 }
 `;
+
+export const ADD_QUESTIONS = gql`
+  mutation CreateQuestions($originalId: String!, $questionList: [questionInput]!) {
+    createQuestions(payload:{originalId: $originalId, questionList: $questionList}){
+      data {
+        originalId
+        question
+        options
+      }
+      status
+      message
+    }
+  }
+`;
+
+export const UPDATE_QUESTIONS = gql`
+  mutation UpdateQuestions($originalId: ID!, $questionInput: questionInput!) {
+  updateQuestions(originalId: $originalId, dataToUpdate: $questionInput){
+    status
+    data{
+      question
+      originalId
+    }
+    message
+  }
+}
+`;
+
+export const DELETE_QUESTIONS = gql`
+  mutation DeleteQuestions($originalId: ID!) {
+  deleteQuestions(id: $originalId) {
+    status
+    message
+  }
+}
+`;
+
+export const SUBMIT_QUESTIONS = gql`
+  mutation SubmitQuestions($answersList: JSON!, $questionSet: ID!) {
+    submitQuestions(answersList: $answersList, questionSet: $questionSet) {
+      result
+      questionSet
+      originalId
+    }
+  }
+`;
