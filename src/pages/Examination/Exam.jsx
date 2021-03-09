@@ -128,7 +128,6 @@ const Exam = ({ match, history }) => {
   const submitted = Object.keys(result).length !== 0;
 
   const handleSubmit = async (openSnackbar) => {
-    console.log(state);
     try {
       const response = await submitQuestions({
         variables: { questionSet: id, answersList: state },

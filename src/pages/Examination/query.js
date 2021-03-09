@@ -11,6 +11,7 @@ export const GETALL_EXAMINATION = gql`
       maximumMarks
       originalId
     }
+    write
   }
 }
 `;

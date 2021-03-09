@@ -26,6 +26,12 @@ const EditQuestion = (props) => {
 
   const [schemaErrors, setSchemaErrors] = useState({});
 
+  // if (!Object.keys(options).lenth) {
+  //   const optionsState = defaultO
+  // ptions.map((value, index) => ({ [`option${index + 1}`]: value }));
+  //   setOptions(optionsState);
+  // }
+
   // validation
   const schema = yup.object().shape({
     question: yup.string().required('question is required').min(3, 'should have more then 3 characters'),
@@ -72,7 +78,13 @@ const EditQuestion = (props) => {
   };
 
   const handleOptionField = (label, input) => {
-    setOptions({ ...options, [label]: input.target.value });
+    const previousOptions = {};
+    if (!Object.keys(options).length) {
+      defaultOptions.forEach((value, index) => {
+        previousOptions[`option${index + 1}`] = value;
+      });
+    }
+    setOptions({ ...previousOptions, ...options, [label]: input.target.value });
   };
 
   const handleEditQuestion = (label, input) => {
@@ -135,6 +147,7 @@ const EditQuestion = (props) => {
               fullWidth
               defaultValue={option}
               className={classes.margin}
+              onBlur={() => handleBlur('option')}
               onChange={(input) => handleOptionField(`option${index + 1}`, input)}
               label="Option"
               variant="outlined"

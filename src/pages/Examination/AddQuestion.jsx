@@ -1,34 +1,127 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
-  TextField, makeStyles, Button,
+  TextField, makeStyles, Button, Container, IconButton, Paper,
+  Typography, RadioGroup, FormControlLabel, Radio, InputAdornment,
 } from '@material-ui/core';
-import { useMutation } from '@apollo/client';
+import CloseIcon from '@material-ui/icons/Close';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import { useMutation, useQuery } from '@apollo/client';
 import * as yup from 'yup';
 import { Form, Field } from 'react-final-form';
 import { ConfirmDialog } from './Components/ConfirmDialog';
-import { ADD_QUESTIONS } from './mutation';
+import { ADD_QUESTIONS, UPDATE_QUESTIONS, DELETE_QUESTIONS } from './mutation';
+import { GETALL_QUESTIONS } from './query';
 import { SnackbarContext } from '../../contexts';
+import { EditQuestion } from './Components/EditQuestion';
+import { DeleteDialog } from './Components/DeleteDialog';
 
-export const useStyle = makeStyles(() => ({
+export const useStyle = makeStyles((theme) => ({
   margin: {
-    margin: '10px',
+    margin: '10px 0px',
   },
-  buttons: {
-    margin: '10px',
+  optionsMargin: {
+    margin: '10px 10px 10px 0px',
+  },
+  question: {
+    marginBottom: theme.spacing(3),
+    padding: theme.spacing(2),
+  },
+  options: {
+    marginLeft: theme.spacing(2),
   },
 }));
 
 const AddQuestions = (props) => {
   const { match, history } = props;
   const [onBlur, setBlur] = useState({});
-  const [inputArray, setInputArray] = useState([1]);
+  const [inputArray] = useState([1]);
   const [optionInputArray, setOptionInputArray] = useState([1, 1]);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [schemaErrors, setSchemaErrors] = useState({});
   const [state, setState] = useState({});
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [details, setDetails] = useState({});
 
+  const { id } = match.params;
+
+  const {
+    data, loading, refetch,
+  } = useQuery(GETALL_QUESTIONS, {
+    variables: {
+      id,
+    },
+    fetchPolicy: 'network-only',
+  });
+
+  const [updateQuestions] = useMutation(UPDATE_QUESTIONS);
+  const [deleteQuestions] = useMutation(DELETE_QUESTIONS);
   const [createQuestions] = useMutation(ADD_QUESTIONS);
+
+  let questions = [];
+
+  if (!loading && !questions.length) {
+    if (data.getAllQuestions.data.length) {
+      const { getAllQuestions: { data: questionsList = [] } = {} } = data;
+      questions = questionsList;
+    }
+  }
+
+  const handleEdit = (questionDetails) => {
+    setEditOpen(true);
+    setDetails(questionDetails);
+  };
+
+  const handleEditClose = () => {
+    setEditOpen(false);
+  };
+
+  const handleEditSubmit = async (questionInput, openSnackbar) => {
+    try {
+      const response = await updateQuestions({
+        variables: { originalId: details.originalId, questionInput },
+      });
+      const {
+        data: { updateQuestions: { message, status, data: responseData } = {} } = {},
+      } = response;
+      if (responseData) {
+        refetch();
+        openSnackbar(status, message);
+        setEditOpen(false);
+      } else {
+        openSnackbar('error', message);
+      }
+    } catch {
+      openSnackbar('error', 'Something went wrong');
+    }
+  };
+
+  const deleteOpenAndClose = (questionDetails) => {
+    setDetails(questionDetails);
+    setDeleteOpen(!deleteOpen);
+  };
+
+  const handleDelete = async (openSnackbar) => {
+    try {
+      const response = await deleteQuestions({
+        variables: { originalId: details.originalId },
+      });
+      const {
+        data: { deleteQuestions: { message, status } = {} } = {},
+      } = response;
+      if (status === 'success') {
+        refetch();
+        openSnackbar(status, message);
+        setDeleteOpen(false);
+      } else {
+        openSnackbar('error', message);
+      }
+    } catch {
+      openSnackbar('error', 'Something went wrong');
+    }
+  };
 
   const schema = yup.object().shape({
     question: yup.string().required('question is required').min(3, 'should have more then 3 characters'),
@@ -45,8 +138,8 @@ const AddQuestions = (props) => {
     setSchemaErrors(schemaError);
   };
 
-  const handleValidate = (questions) => {
-    questions.forEach((question) => {
+  const handleValidate = (newQuestions) => {
+    newQuestions.forEach((question) => {
       schema.validate(question, { abortEarly: false })
         .then(() => { handleErrors({}); })
         .catch((err) => { handleErrors(err); });
@@ -61,7 +154,7 @@ const AddQuestions = (props) => {
     setConfirmOpen(false);
     try {
       if (!hasErrors()) {
-        const variables = { originalId: match.params.id, questionList: state };
+        const variables = { originalId: id, questionList: state };
         const response = await createQuestions({
           variables,
         });
@@ -84,6 +177,10 @@ const AddQuestions = (props) => {
     setConfirmOpen(false);
   };
 
+  const handleBack = () => {
+    history.push('/exam');
+  };
+
   const getError = (label) => {
     if (onBlur[label]) {
       return schemaErrors[label] || '';
@@ -93,6 +190,10 @@ const AddQuestions = (props) => {
 
   const handleBlur = (label) => {
     setBlur({ ...onBlur, [label]: true });
+  };
+  const closeOption = (arrayOfOptions) => {
+    arrayOfOptions.pop();
+    return arrayOfOptions;
   };
 
   const handleSubmitQuestion = (values) => {
@@ -115,7 +216,49 @@ const AddQuestions = (props) => {
   return (
     <SnackbarContext.Consumer>
       {({ openSnackbar }) => (
-        <>
+        <Container>
+          {
+            questions.map((questionDetail) => (
+              <Paper key={questionDetail.originalId} className={classes.question}>
+                <Typography variant="h6">
+                  {questionDetail.question}
+                </Typography>
+                <Typography align="right">
+                  {
+                    questionDetail.correctOption
+                && (
+                  <>
+                    <IconButton disableFocusRipple size="small" onClick={() => handleEdit(questionDetail)}>
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton disableFocusRipple size="small" onClick={() => deleteOpenAndClose(questionDetail)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </>
+                )
+                  }
+                </Typography>
+                <RadioGroup className={classes.options} aria-label="answer" name="solution">
+                  {
+                    questionDetail.options.map((option) => (
+                      <FormControlLabel key={option} value={option} control={<Radio color="primary" />} label={option} />
+                    ))
+                  }
+                </RadioGroup>
+              </Paper>
+            ))
+          }
+          <EditQuestion
+            open={editOpen}
+            defaultValues={details}
+            onSubmit={(input) => handleEditSubmit(input, openSnackbar)}
+            onClose={handleEditClose}
+          />
+          <DeleteDialog
+            open={deleteOpen}
+            onClose={deleteOpenAndClose}
+            onDelete={() => handleDelete(openSnackbar)}
+          />
           <Form
             onSubmit={handleSubmitQuestion}
             render={({ handleSubmit }) => (
@@ -164,9 +307,12 @@ const AddQuestions = (props) => {
                               <TextField
                                 {...input}
                                 size="small"
-                                className={classes.margin}
+                                className={classes.optionsMargin}
                                 label="Option"
                                 variant="outlined"
+                                InputProps={{
+                                  endAdornment: <InputAdornment position="end"><IconButton onClick={() => setOptionInputArray(closeOption(optionInputArray))} size="small"><CloseIcon style={{ fontSize: 20 }} opacity="0.6" /></IconButton></InputAdornment>,
+                                }}
                               />
                             )}
                           />
@@ -176,11 +322,11 @@ const AddQuestions = (props) => {
                   ))
                 }
                 <div>
-                  <Button className={classes.buttons} variant="outlined" onClick={() => setOptionInputArray([...optionInputArray, 1])} color="secondary">
+                  <Button className={classes.optionsMargin} variant="outlined" onClick={() => setOptionInputArray([...optionInputArray, 1])} color="secondary">
                     Add More Option Fields
                   </Button>
-                  <Button className={classes.buttons} variant="outlined" onClick={() => setInputArray([...inputArray, 1])} color="secondary">
-                    Add Question
+                  <Button className={classes.optionsMargin} variant="outlined" onClick={handleBack} color="secondary">
+                    Close
                   </Button>
                 </div>
                 <Button fullWidth type="submit" className={classes.buttons} variant="contained" disabled={!isTouched()} color="primary">
@@ -194,7 +340,7 @@ const AddQuestions = (props) => {
             onSubmit={() => submitQuestions(openSnackbar)}
             onClose={handleConfirmClose}
           />
-        </>
+        </Container>
       )}
     </SnackbarContext.Consumer>
   );

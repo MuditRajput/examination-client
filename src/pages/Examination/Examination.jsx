@@ -28,9 +28,11 @@ const Examination = (props) => {
   } = useQuery(GETALL_EXAMINATION, { variables: {}, fetchPolicy: 'network-only' });
   const EnhancedTable = withLoaderAndMessage(TableComponent);
   let examinations = [];
+  let write = false;
   if (!getAllExaminationLoading && !examinations.length) {
-    const { getAllExamination: { data: Exams = [] } = {} } = data;
+    const { getAllExamination: { data: Exams = [], write: writePermission = false } = {} } = data;
     examinations = Exams;
+    write = writePermission;
   }
 
   const [createExamination] = useMutation(CREATE_EXAMINATION);
@@ -158,7 +160,7 @@ const Examination = (props) => {
                 label: 'Maximum Marks',
               },
             ]}
-            actions={[
+            actions={write ? [
               {
                 icon: <EditIcon />,
                 handler: handleEditDialogOpen,
@@ -171,7 +173,7 @@ const Examination = (props) => {
                 icon: <AddIcon fontSize="large" />,
                 handler: handleAddQuestions,
               },
-            ]}
+            ] : []}
             onSelect={handleSelect}
             onSort={handleSort}
             onChangePage={handleChangePage}
