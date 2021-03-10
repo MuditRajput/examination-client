@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   RadioGroup, FormControlLabel, Radio, Container, Typography, makeStyles, IconButton,
@@ -12,6 +12,7 @@ import { DeleteDialog } from './Components/DeleteDialog';
 import { GETALL_QUESTIONS } from './query';
 import { UPDATE_QUESTIONS, DELETE_QUESTIONS, SUBMIT_QUESTIONS } from './mutation';
 import { SnackbarContext } from '../../contexts';
+import { Timer } from '../../components';
 
 const useStyles = makeStyles((theme) => ({
   question: {
@@ -38,6 +39,26 @@ const Exam = ({ match, history }) => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [details, setDetails] = useState({});
   const [result, setResult] = useState({});
+  const [viewTimer, setViewTimer] = useState(true);
+  const [seconds, setSeconds] = useState(59);
+  const [minutes, setMinutes] = useState(0);
+  const [marks, setMarks] = useState(0);
+
+  useEffect(() => {
+    if (minutes > 1) {
+      setTimeout(() => {
+        setMinutes(minutes - 1);
+      }, 60000);
+    }
+    if (viewTimer && seconds === 0) {
+      setSeconds(59);
+    }
+    if (viewTimer && seconds >= 1) {
+      setTimeout(() => {
+        setSeconds(seconds - 1);
+      }, 1000);
+    }
+  }, [seconds, minutes]);
 
   const { id } = match.params;
 
@@ -127,7 +148,7 @@ const Exam = ({ match, history }) => {
 
   const submitted = Object.keys(result).length !== 0;
 
-  const handleSubmit = async (openSnackbar) => {
+  const handleSubmit = async (openSnackbar, message) => {
     try {
       const response = await submitQuestions({
         variables: { questionSet: id, answersList: state },
@@ -135,9 +156,17 @@ const Exam = ({ match, history }) => {
       const {
         data: { submitQuestions: { result: resultResponse } = {} } = {},
       } = response;
+      setViewTimer(false);
       if (resultResponse) {
         refetch();
-        openSnackbar('success', 'Successfull');
+        if (message) {
+          openSnackbar('error', message);
+        } else {
+          openSnackbar('success', 'Successfull');
+        }
+        const resultValues = Object.values(resultResponse);
+        const correctValues = resultValues.filter((value) => (value || ''));
+        setMarks(correctValues.length);
         setResult(resultResponse);
       } else {
         openSnackbar('error', 'Retry');
@@ -175,6 +204,16 @@ const Exam = ({ match, history }) => {
     <SnackbarContext.Consumer>
       {({ openSnackbar }) => (
         <Container>
+          { !viewTimer
+            ? (
+              <Typography align="right" variant="h4">
+                Marks Obtained:
+                {marks}
+                /
+                {Object.keys(result).length}
+              </Typography>
+            )
+            : <Timer minutes={minutes} seconds={seconds} onComplete={() => handleSubmit(openSnackbar, 'Timeout !!!')} />}
           {
             questions.map((questionDetail) => (
               <Paper key={questionDetail.originalId} className={classes.question}>

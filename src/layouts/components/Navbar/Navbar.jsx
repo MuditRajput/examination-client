@@ -32,6 +32,9 @@ const NavBar = (props) => {
           <NavLink to="/exam">
             <Button className={classes.menuButton}>EXAMINATION</Button>
           </NavLink>
+          <NavLink to="/results">
+            <Button className={classes.menuButton}>RESULTS</Button>
+          </NavLink>
           <NavLink to="/trainee">
             <Button className={classes.menuButton}>TRAINEE</Button>
           </NavLink>

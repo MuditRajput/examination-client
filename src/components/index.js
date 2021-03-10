@@ -6,3 +6,4 @@ export { Button } from './button';
 export { Math } from './Math';
 export { TableComponent } from './Table';
 export { withLoaderAndMessage } from './HOC';
+export { Timer } from './Timer';

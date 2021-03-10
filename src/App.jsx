@@ -5,7 +5,7 @@ import { ApolloProvider } from '@apollo/client';
 import { AuthRoute, PrivateRoute } from './routes';
 import {
   ChildrenDemo, TextFieldDemo, InputDemo, LoginUi, AddQuestion,
-  NoMatch, TraineeDetail, TraineeList, Examination, Exam,
+  NoMatch, TraineeDetail, TraineeList, Examination, Exam, Results,
 } from './pages';
 import theme from './theme';
 import { SnackBarProvider } from './contexts';
@@ -22,6 +22,7 @@ function App() {
               <Redirect exact path="/" to="/trainee" />
               <AuthRoute exact path="/login" component={LoginUi} />
               <PrivateRoute exact path="/exam" component={Examination} />
+              <PrivateRoute exact path="/results" component={Results} />
               <PrivateRoute exact path="/exam/add/:id" component={AddQuestion} />
               <PrivateRoute path="/exam/:id" component={Exam} />
               <PrivateRoute exact path="/trainee" component={TraineeList} />
