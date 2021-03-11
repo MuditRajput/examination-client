@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -22,9 +23,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Results = () => {
+const Results = ({ history }) => {
   const classes = useStyles();
   const marks = [];
+  const totalMarks = [];
   const {
     data, loading,
   } = useQuery(GETALL_RESULTS, {
@@ -38,11 +40,17 @@ const Results = () => {
       results = resultList;
       resultList.forEach((result) => {
         const resultValues = Object.values(result.result);
-        const correctValues = resultValues.filter((value) => (value || ''));
+        totalMarks.push(resultValues.length);
+        const correctValues = resultValues.filter((value) => (value[0] || ''));
         marks.push(correctValues.length);
       });
     }
   }
+
+  const goToDetail = (id) => {
+    history.push(`/results/${id}`);
+  };
+
   const getDateFormatted = (date) => moment(date).format('dddd, MMMM Do yyyy, hh:mm:ss a');
   return (
     <>
@@ -72,14 +80,18 @@ const Results = () => {
           </TableHead>
           <TableBody>
             {results.map((result, index) => (
-              <TableRow className={classes.rowHover} key={result.id}>
+              <TableRow
+                onClick={() => goToDetail(result.originalId)}
+                className={classes.rowHover}
+                key={result.id}
+              >
                 <TableCell>{result.questionSet}</TableCell>
                 <TableCell>{getDateFormatted(result.createdAt)}</TableCell>
                 <TableCell align="right">
                   <Typography>
                     {marks[index]}
                     /
-                    {Object.keys(results).length}
+                    {totalMarks[index]}
                   </Typography>
                 </TableCell>
               </TableRow>
@@ -89,6 +101,10 @@ const Results = () => {
       </TableContainer>
     </>
   );
+};
+
+Results.propTypes = {
+  history: PropTypes.object.isRequired,
 };
 
 export default Results;

@@ -22,6 +22,11 @@ const useStyles = makeStyles((theme) => ({
   options: {
     marginLeft: theme.spacing(2),
   },
+  resultOption: {
+    background: '#efefef',
+    padding: '10px',
+    marginTop: '10px',
+  },
   correctOption: {
     borderRadius: '3px',
     background: '#98de8b80',
@@ -165,7 +170,7 @@ const Exam = ({ match, history }) => {
           openSnackbar('success', 'Successfull');
         }
         const resultValues = Object.values(resultResponse);
-        const correctValues = resultValues.filter((value) => (value || ''));
+        const correctValues = resultValues.filter((value) => (value[0] || ''));
         setMarks(correctValues.length);
         setResult(resultResponse);
       } else {
@@ -177,10 +182,10 @@ const Exam = ({ match, history }) => {
   };
 
   const colortype = (originalId, option) => {
-    if (result[originalId] && (state[originalId] === option)) {
+    if ((result[originalId]?.[0]) && (state[originalId] === option)) {
       return classes.correctOption;
     }
-    if (result[originalId] === false && (state[originalId] === option)) {
+    if ((result[originalId]?.[0]) === false && (state[originalId] === option)) {
       return classes.wrongOption;
     }
     return '';
@@ -238,10 +243,23 @@ const Exam = ({ match, history }) => {
                 <RadioGroup className={classes.options} onChange={(input) => { handleOptionField(input, questionDetail.originalId); }} aria-label="answer" name="solution">
                   {
                     questionDetail.options.map((option) => (
-                      <FormControlLabel className={colortype(questionDetail.originalId, option)} disabled={submitted} key={option} value={option} control={<Radio color="primary" />} label={option} />
+                      <>
+                        <FormControlLabel className={colortype(questionDetail.originalId, option)} disabled={submitted} key={option} value={option} control={<Radio color="primary" />} label={option} />
+                      </>
                     ))
                   }
                 </RadioGroup>
+                {
+                  submitted
+                  && (
+                    <Typography className={classes.resultOption} component="div" color="primary">
+                      <Typography color="textPrimary" component="i">
+                        {'Correct Answer:   '}
+                      </Typography>
+                      {result[questionDetail.originalId][1]}
+                    </Typography>
+                  )
+                }
               </Paper>
             ))
           }

@@ -23,10 +23,26 @@ export const GETONE_RESULT = gql`
         originalId
         createdAt
         result
+        questionSet
         userId
       }
       message
       status
     }
   }
+`;
+
+export const GETALL_QUESTIONS = gql`
+  query GetAllQuestions($id: ID!) {
+  getAllQuestions(id:$id){
+    data{
+      question
+      options
+      correctOption
+      originalId
+    }
+    status
+    message
+  }
+}
 `;

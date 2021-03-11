@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import readXlsxFile from 'read-excel-file';
 import { Button } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
@@ -134,6 +135,13 @@ const Examination = (props) => {
     history.push(`${match.path}/add/${questionDetails.originalId}`);
   };
 
+  const handleFileUpload = (input) => {
+    const file = input.target.files[0];
+    readXlsxFile(file).then((sheets) => {
+      console.log(sheets[0]);
+    });
+  };
+
   return (
     <SnackbarContext.Consumer>
       {({ openSnackbar }) => (
@@ -141,6 +149,7 @@ const Examination = (props) => {
           <Button size="large" variant="outlined" color="primary" onClick={handleOpenAddExamination}>
             Add Examination
           </Button>
+          <input onChange={handleFileUpload} accept="xlsx" type="file" id="input" />
           <EnhancedTable
             id="originalId"
             loader={getAllExaminationLoading}
@@ -182,13 +191,13 @@ const Examination = (props) => {
           <AddExamination
             open={open}
             onClose={handleOpenAddExamination}
-            onSubmit={(input) => handleAddExaminationSubmit(input, openSnackbar)}
+            onSubmit={(event) => handleAddExaminationSubmit(event, openSnackbar)}
           />
           <EditExamination
             open={editOpen}
             defaultValues={details}
             onClose={handleEditDialogClose}
-            onSubmit={(input) => handleEditDialogSubmit(input, openSnackbar)}
+            onSubmit={(event) => handleEditDialogSubmit(event, openSnackbar)}
           />
           <DeleteDialog
             open={deleteOpen}
