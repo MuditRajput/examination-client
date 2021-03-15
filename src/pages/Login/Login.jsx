@@ -106,7 +106,6 @@ const LoginUi = (props) => {
     const { email, password } = state;
     try {
       const response = await loginUser({ variables: { email, password } });
-      console.log(response);
       const { data: { loginUser: { data, status, message } = {} } = {} } = response;
       if (data) {
         openSnackbar(status, message);
@@ -124,7 +123,6 @@ const LoginUi = (props) => {
 
   const hangleLogin = (openSnackbar) => {
     setLoading(true);
-    console.log(state);
     handleCallApi(openSnackbar);
   };
 

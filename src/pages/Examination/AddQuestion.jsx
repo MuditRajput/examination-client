@@ -193,7 +193,7 @@ const AddQuestions = (props) => {
   };
   const closeOption = (arrayOfOptions) => {
     arrayOfOptions.pop();
-    return arrayOfOptions;
+    return [...arrayOfOptions];
   };
 
   const handleSubmitQuestion = (values) => {

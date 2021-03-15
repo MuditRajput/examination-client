@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client';
 
 export const CREATE_EXAMINATION = gql`
-  mutation CreateTrainee($subject: String!, $description: String, $maximumMarks: String) {
-  createExamination(subject: $subject, description: $description, maximumMarks: $maximumMarks){
+  mutation CreateTrainee($subject: String!, $description: String, $maximumMarks: String, $time: String!) {
+  createExamination(subject: $subject, description: $description, maximumMarks: $maximumMarks, time: $time){
     status
     message
     data{
@@ -10,6 +10,7 @@ export const CREATE_EXAMINATION = gql`
       description
       maximumMarks
       originalId
+      time
     }
   }
 }

@@ -35,7 +35,7 @@ const Results = ({ history }) => {
   let results = [];
 
   if (!loading && !results.length) {
-    if (data.getAllResult.data.length) {
+    if (data.getAllResult.data) {
       const { getAllResult: { data: resultList = [] } = {} } = data;
       results = resultList;
       resultList.forEach((result) => {

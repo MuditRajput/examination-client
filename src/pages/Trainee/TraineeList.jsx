@@ -141,7 +141,6 @@ const TraineeList = (props) => {
 
   const handleSubmit = async (openSnackbar, state) => {
     setLoading(true);
-    console.log(state);
     const { name, email, password } = state;
     try {
       const response = await createTrainee({ variables: { name, email, password } });
@@ -177,7 +176,6 @@ const TraineeList = (props) => {
 
   const handleEditDialogSubmit = async (openSnackbar, state) => {
     setLoading(true);
-    console.log(state);
     const { originalId } = details;
     const { email, name } = state;
     try {
@@ -206,7 +204,6 @@ const TraineeList = (props) => {
 
   const handleDelete = async (openSnackbar) => {
     setLoading(true);
-    console.log(details);
     const { originalId } = details;
     if (details.createdAt <= '2019-02-14') {
       openSnackbar('error', 'Trainee cannot be Deleted');

@@ -10,6 +10,14 @@ export const useStyle = makeStyles(() => ({
   margin: {
     margin: '10px 0',
   },
+  flexRow: {
+    display: 'flex',
+    alignContent: 'space-between',
+    margin: '10px 0',
+  },
+  flexElements: {
+    marginLeft: '15px',
+  },
 }));
 
 const AddExamination = (props) => {
@@ -21,10 +29,11 @@ const AddExamination = (props) => {
     subject: yup.string().required('Subject is required').min(3, 'should have more then 3 characters'),
     description: yup.string(),
     maximumMarks: yup.number(),
+    time: yup.number().required('Time is reuired'),
   });
 
   const [state, setstate] = useState({
-    subject: '', description: '', maximumMarks: '',
+    subject: '', description: '', maximumMarks: '', time: '',
   });
 
   const [onBlur, setBlur] = useState({});
@@ -75,14 +84,14 @@ const AddExamination = (props) => {
   const handleOnSubmit = () => {
     onSubmit(state);
     setstate({
-      subject: '', description: '', maximumMarks: 0,
+      subject: '', description: '', maximumMarks: '', time: '',
     });
     setBlur({});
   };
 
   const handleClose = () => {
     setstate({
-      subject: '', description: '', maximumMarks: 0,
+      subject: '', description: '', maximumMarks: '', time: '',
     });
     setBlur({});
     onClose();
@@ -126,17 +135,34 @@ const AddExamination = (props) => {
           label="Description"
           variant="outlined"
         />
-        <TextField
-          size="small"
-          fullWidth
-          error={!!getError('maximumMarks')}
-          helperText={getError('maximumMarks')}
-          className={classes.margin}
-          onChange={(input) => handleInputField('maximumMarks', input)}
-          onBlur={() => handleBlur('maximumMarks')}
-          label="Maximum Marks"
-          variant="outlined"
-        />
+        <div className={classes.flexRow}>
+          <TextField
+            size="small"
+            fullWidth
+            error={!!getError('maximumMarks')}
+            helperText={getError('maximumMarks')}
+            onChange={(input) => handleInputField('maximumMarks', input)}
+            onBlur={() => handleBlur('maximumMarks')}
+            label="Maximum Marks"
+            variant="outlined"
+          />
+          <TextField
+            id="outlined-number"
+            type="number"
+            // InputLabelProps={{
+            //   shrink: true,
+            // }}
+            variant="outlined"
+            size="small"
+            fullWidth
+            error={!!getError('time')}
+            helperText={getError('time')}
+            className={classes.flexElements}
+            onChange={(input) => handleInputField('time', input)}
+            onBlur={() => handleBlur('time')}
+            label="Time (in minutes)"
+          />
+        </div>
       </DialogContent>
       <DialogActions className={classes.margin}>
         <Button autoFocus onClick={handleClose} color="secondary">

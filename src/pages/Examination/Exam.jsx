@@ -46,13 +46,14 @@ const Exam = ({ match, history }) => {
   const [result, setResult] = useState({});
   const [viewTimer, setViewTimer] = useState(true);
   const [seconds, setSeconds] = useState(59);
-  const [minutes, setMinutes] = useState(0);
+  const [minutes, setMinutes] = useState(Number(localStorage.getItem('time') - 1) || 0);
   const [marks, setMarks] = useState(0);
 
   useEffect(() => {
     if (minutes > 1) {
       setTimeout(() => {
         setMinutes(minutes - 1);
+        localStorage.setItem('time', minutes);
       }, 60000);
     }
     if (viewTimer && seconds === 0) {
@@ -82,7 +83,7 @@ const Exam = ({ match, history }) => {
 
   let questions = [];
 
-  if (!loading && !questions.length) {
+  if (!loading) {
     if (data.getAllQuestions.data.length) {
       const { getAllQuestions: { data: questionsList = [] } = {} } = data;
       questions = questionsList;

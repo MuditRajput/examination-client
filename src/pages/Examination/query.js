@@ -10,6 +10,7 @@ export const GETALL_EXAMINATION = gql`
       description
       maximumMarks
       originalId
+      time
     }
     write
   }

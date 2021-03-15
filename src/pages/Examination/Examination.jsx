@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import readXlsxFile from 'read-excel-file';
 import { Button } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
+import PublishIcon from '@material-ui/icons/Publish';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { useQuery, useMutation } from '@apollo/client';
 import AddIcon from '@material-ui/icons/Add';
@@ -10,8 +11,11 @@ import { TableComponent, withLoaderAndMessage } from '../../components';
 import { AddExamination } from './Components/AddDialog';
 import { EditExamination } from './Components/EditDialog';
 import { DeleteDialog } from './Components/DeleteDialog';
+import { ConfirmDialog } from './Components/ConfirmDialog';
 import { GETALL_EXAMINATION } from './query';
-import { CREATE_EXAMINATION, UPDATE_EXAMINATION, DELETE_EXAMINATION } from './mutation';
+import {
+  CREATE_EXAMINATION, UPDATE_EXAMINATION, DELETE_EXAMINATION, ADD_QUESTIONS,
+} from './mutation';
 import { SnackbarContext } from '../../contexts';
 
 const Examination = (props) => {
@@ -23,6 +27,8 @@ const Examination = (props) => {
   const [details, setDetails] = useState({});
   const [order, setOrder] = useState();
   const [orderBy, setOrderBy] = useState();
+  const [questionList, setQuestionList] = useState([]);
+  const [confirmAdd, setConfirmAdd] = useState(false);
 
   const {
     data, loading: getAllExaminationLoading, refetch,
@@ -39,9 +45,35 @@ const Examination = (props) => {
   const [createExamination] = useMutation(CREATE_EXAMINATION);
   const [updateExamination] = useMutation(UPDATE_EXAMINATION);
   const [deleteExamination] = useMutation(DELETE_EXAMINATION);
+  const [createQuestions] = useMutation(ADD_QUESTIONS);
 
   const handleOpenAddExamination = () => {
     setOpen(!open);
+  };
+
+  const closeConfirm = () => {
+    setDetails({});
+    setConfirmAdd(false);
+  };
+
+  const submitConfirm = async (openSnackbar) => {
+    try {
+      const variables = { originalId: details.originalId, questionList };
+      const response = await createQuestions({
+        variables,
+      });
+      const {
+        data: { createQuestions: { message, status, data: responseData } = {} } = {},
+      } = response;
+      if (responseData) {
+        openSnackbar(status, message);
+        closeConfirm();
+      } else {
+        openSnackbar('error', message);
+      }
+    } catch {
+      openSnackbar('error', 'Something went wrong');
+    }
   };
 
   const handleAddExaminationSubmit = async (examinationDetails, openSnackbar) => {
@@ -129,16 +161,47 @@ const Examination = (props) => {
 
   const handleSelect = (property) => {
     history.push(`${match.path}/${property}`);
+    localStorage.setItem('time', (examinations.find((exam) => exam.originalId === property)).time);
   };
 
   const handleAddQuestions = (questionDetails) => {
     history.push(`${match.path}/add/${questionDetails.originalId}`);
   };
 
-  const handleFileUpload = (input) => {
+  const handleFileUploadDetails = (examDetails) => {
+    if (!Object.keys(details).length) {
+      setDetails(examDetails);
+    }
+  };
+
+  const handleFileUpload = (input, openSnackbar) => {
     const file = input.target.files[0];
     readXlsxFile(file).then((sheets) => {
-      console.log(sheets[0]);
+      const questions = [];
+      sheets.forEach((sheet, index) => {
+        const [question, correctOption, ...rest] = sheet;
+        if (!question || !correctOption) {
+          openSnackbar('error', `File is missing required field at ${index + 1} line`);
+        }
+        const options = [];
+        rest.forEach((option) => {
+          if (option) {
+            options.push(`${option}`);
+          }
+        });
+        console.log(options);
+        questions.push(
+          {
+            question,
+            correctOption: `${correctOption}`,
+            options,
+          },
+        );
+      });
+      setQuestionList(questions);
+      setConfirmAdd(true);
+    }).catch(() => {
+      openSnackbar('error', 'File Parse Error');
     });
   };
 
@@ -149,7 +212,6 @@ const Examination = (props) => {
           <Button size="large" variant="outlined" color="primary" onClick={handleOpenAddExamination}>
             Add Examination
           </Button>
-          <input onChange={handleFileUpload} accept="xlsx" type="file" id="input" />
           <EnhancedTable
             id="originalId"
             loader={getAllExaminationLoading}
@@ -168,6 +230,12 @@ const Examination = (props) => {
                 field: 'maximumMarks',
                 label: 'Maximum Marks',
               },
+              {
+                field: 'time',
+                label: 'Time',
+                format: (value) => value && `${value} Minutes`,
+
+              },
             ]}
             actions={write ? [
               {
@@ -181,6 +249,20 @@ const Examination = (props) => {
               {
                 icon: <AddIcon fontSize="large" />,
                 handler: handleAddQuestions,
+              },
+              {
+                icon:
+              <label htmlFor="fileInput" style={{ display: 'table' }}>
+                <PublishIcon />
+                <input
+                  style={{ display: 'none' }}
+                  onChange={(input) => handleFileUpload(input, openSnackbar)}
+                  type="file"
+                  size="60"
+                  id="fileInput"
+                />
+              </label>,
+                handler: handleFileUploadDetails,
               },
             ] : []}
             onSelect={handleSelect}
@@ -203,6 +285,11 @@ const Examination = (props) => {
             open={deleteOpen}
             onClose={handleDeleteDialogClose}
             onDelete={() => handleDeleteDialogSubmit(openSnackbar)}
+          />
+          <ConfirmDialog
+            open={confirmAdd}
+            onClose={closeConfirm}
+            onSubmit={() => submitConfirm(openSnackbar)}
           />
         </>
       )}
