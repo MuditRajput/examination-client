@@ -48,24 +48,25 @@ const Exam = ({ match, history }) => {
   const [seconds, setSeconds] = useState(59);
   const [minutes, setMinutes] = useState(Number(localStorage.getItem('time') - 1) || 0);
   const [marks, setMarks] = useState(0);
+  const [numberOfAttempts, setNumberOfAttempts] = useState(0);
 
+  const maximumAttempts = localStorage.getItem('maxAttempts');
   useEffect(() => {
-    if (minutes > 1) {
+    if (minutes > 1 && Number(maximumAttempts) === numberOfAttempts) {
       setTimeout(() => {
         setMinutes(minutes - 1);
         localStorage.setItem('time', minutes);
       }, 60000);
     }
-    if (viewTimer && seconds === 0) {
+    if (viewTimer && seconds === 0 && Number(maximumAttempts) === numberOfAttempts) {
       setSeconds(59);
     }
-    if (viewTimer && seconds >= 1) {
+    if (viewTimer && seconds >= 1 && Number(maximumAttempts) === numberOfAttempts) {
       setTimeout(() => {
         setSeconds(seconds - 1);
       }, 1000);
     }
   }, [seconds, minutes]);
-
   const { id } = match.params;
 
   const {
@@ -84,9 +85,12 @@ const Exam = ({ match, history }) => {
   let questions = [];
 
   if (!loading) {
-    if (data.getAllQuestions.data.length) {
-      const { getAllQuestions: { data: questionsList = [] } = {} } = data;
+    if (data.getAllQuestions.data && !numberOfAttempts) {
+      const {
+        getAllQuestions: { data: questionsList = [], numberOfAttempts: attempts = 0 } = {},
+      } = data;
       questions = questionsList;
+      setNumberOfAttempts(attempts);
     }
   }
 
@@ -195,6 +199,14 @@ const Exam = ({ match, history }) => {
   if (loading) {
     return (
       <CircularProgress />
+    );
+  }
+
+  if (Number(maximumAttempts) === numberOfAttempts) {
+    return (
+      <Typography>
+        Attempt Limit Reached
+      </Typography>
     );
   }
 

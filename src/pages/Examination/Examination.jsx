@@ -160,6 +160,7 @@ const Examination = (props) => {
   };
 
   const handleSelect = (property) => {
+    localStorage.setItem('maxAttempts', (examinations.find((exam) => exam.originalId === property)).maxAttempts);
     history.push(`${match.path}/${property}`);
     localStorage.setItem('time', (examinations.find((exam) => exam.originalId === property)).time);
   };
@@ -189,7 +190,6 @@ const Examination = (props) => {
             options.push(`${option}`);
           }
         });
-        console.log(options);
         questions.push(
           {
             question,
@@ -235,6 +235,10 @@ const Examination = (props) => {
                 label: 'Time',
                 format: (value) => value && `${value} Minutes`,
 
+              },
+              {
+                field: 'maxAttempts',
+                label: 'Maximum Attempts',
               },
             ]}
             actions={write ? [

@@ -29,11 +29,12 @@ const AddExamination = (props) => {
     subject: yup.string().required('Subject is required').min(3, 'should have more then 3 characters'),
     description: yup.string(),
     maximumMarks: yup.number(),
-    time: yup.number().required('Time is reuired'),
+    time: yup.number().required('Time is required'),
+    maxAttempts: yup.number().required('Maximum number of attepts is required'),
   });
 
   const [state, setstate] = useState({
-    subject: '', description: '', maximumMarks: '', time: '',
+    subject: '', description: '', maximumMarks: '', time: '', maxAttempts: '',
   });
 
   const [onBlur, setBlur] = useState({});
@@ -84,14 +85,14 @@ const AddExamination = (props) => {
   const handleOnSubmit = () => {
     onSubmit(state);
     setstate({
-      subject: '', description: '', maximumMarks: '', time: '',
+      subject: '', description: '', maximumMarks: '', time: '', maxAttempts: '',
     });
     setBlur({});
   };
 
   const handleClose = () => {
     setstate({
-      subject: '', description: '', maximumMarks: '', time: '',
+      subject: '', description: '', maximumMarks: '', time: '', maxAttempts: '',
     });
     setBlur({});
     onClose();
@@ -149,9 +150,6 @@ const AddExamination = (props) => {
           <TextField
             id="outlined-number"
             type="number"
-            // InputLabelProps={{
-            //   shrink: true,
-            // }}
             variant="outlined"
             size="small"
             fullWidth
@@ -161,6 +159,19 @@ const AddExamination = (props) => {
             onChange={(input) => handleInputField('time', input)}
             onBlur={() => handleBlur('time')}
             label="Time (in minutes)"
+          />
+          <TextField
+            id="outlined-number"
+            type="number"
+            variant="outlined"
+            size="small"
+            fullWidth
+            error={!!getError('maxAttempts')}
+            helperText={getError('maxAttempts')}
+            className={classes.flexElements}
+            onChange={(input) => handleInputField('maxAttempts', input)}
+            onBlur={() => handleBlur('maxAttempts')}
+            label="Maximum number of attempts"
           />
         </div>
       </DialogContent>

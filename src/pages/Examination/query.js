@@ -11,6 +11,7 @@ export const GETALL_EXAMINATION = gql`
       maximumMarks
       originalId
       time
+      maxAttempts
     }
     write
   }
@@ -26,6 +27,7 @@ export const GETALL_QUESTIONS = gql`
       correctOption
       originalId
     }
+    numberOfAttempts
     status
     message
   }
