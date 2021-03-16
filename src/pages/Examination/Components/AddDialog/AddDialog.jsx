@@ -2,29 +2,16 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   DialogActions, Dialog, DialogContentText, DialogContent, CircularProgress,
-  DialogTitle, Button, TextField, makeStyles,
+  DialogTitle, Button, TextField,
 } from '@material-ui/core';
 import * as yup from 'yup';
-
-export const useStyle = makeStyles(() => ({
-  margin: {
-    margin: '10px 0',
-  },
-  flexRow: {
-    display: 'flex',
-    alignContent: 'space-between',
-    margin: '10px 0',
-  },
-  flexElements: {
-    marginLeft: '15px',
-  },
-}));
+import { useStyles } from '../../style';
 
 const AddExamination = (props) => {
   const {
     open, onClose, onSubmit, loading,
   } = props;
-  const classes = useStyle();
+  const classes = useStyles();
   const schema = yup.object().shape({
     subject: yup.string().required('Subject is required').min(3, 'should have more then 3 characters'),
     description: yup.string(),

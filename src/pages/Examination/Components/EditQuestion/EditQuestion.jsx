@@ -26,12 +26,6 @@ const EditQuestion = (props) => {
 
   const [schemaErrors, setSchemaErrors] = useState({});
 
-  // if (!Object.keys(options).lenth) {
-  //   const optionsState = defaultO
-  // ptions.map((value, index) => ({ [`option${index + 1}`]: value }));
-  //   setOptions(optionsState);
-  // }
-
   // validation
   const schema = yup.object().shape({
     question: yup.string().required('question is required').min(3, 'should have more then 3 characters'),

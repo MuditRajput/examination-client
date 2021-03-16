@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
-  RadioGroup, FormControlLabel, Radio, Container, Typography, makeStyles, IconButton,
+  RadioGroup, FormControlLabel, Radio, Container, Typography, IconButton,
   Paper, Button, CircularProgress,
 } from '@material-ui/core';
 import { useQuery, useMutation } from '@apollo/client';
@@ -13,29 +13,7 @@ import { GETALL_QUESTIONS } from './query';
 import { UPDATE_QUESTIONS, DELETE_QUESTIONS, SUBMIT_QUESTIONS } from './mutation';
 import { SnackbarContext } from '../../contexts';
 import { Timer } from '../../components';
-
-const useStyles = makeStyles((theme) => ({
-  question: {
-    marginBottom: theme.spacing(3),
-    padding: theme.spacing(2),
-  },
-  options: {
-    marginLeft: theme.spacing(2),
-  },
-  resultOption: {
-    background: '#efefef',
-    padding: '10px',
-    marginTop: '10px',
-  },
-  correctOption: {
-    borderRadius: '3px',
-    background: '#98de8b80',
-  },
-  wrongOption: {
-    borderRadius: '3px',
-    background: '#eec5c5',
-  },
-}));
+import { useStyles } from './style';
 
 const Exam = ({ match, history }) => {
   const classes = useStyles();
@@ -45,28 +23,11 @@ const Exam = ({ match, history }) => {
   const [details, setDetails] = useState({});
   const [result, setResult] = useState({});
   const [viewTimer, setViewTimer] = useState(true);
-  const [seconds, setSeconds] = useState(59);
+  const [seconds, setSeconds] = useState(localStorage.getItem('seconds') ? Number(localStorage.getItem('seconds') - 1) : 59);
   const [minutes, setMinutes] = useState(Number(localStorage.getItem('time') - 1) || 0);
   const [marks, setMarks] = useState(0);
-  const [numberOfAttempts, setNumberOfAttempts] = useState(0);
 
   const maximumAttempts = localStorage.getItem('maxAttempts');
-  useEffect(() => {
-    if (minutes > 1 && Number(maximumAttempts) === numberOfAttempts) {
-      setTimeout(() => {
-        setMinutes(minutes - 1);
-        localStorage.setItem('time', minutes);
-      }, 60000);
-    }
-    if (viewTimer && seconds === 0 && Number(maximumAttempts) === numberOfAttempts) {
-      setSeconds(59);
-    }
-    if (viewTimer && seconds >= 1 && Number(maximumAttempts) === numberOfAttempts) {
-      setTimeout(() => {
-        setSeconds(seconds - 1);
-      }, 1000);
-    }
-  }, [seconds, minutes]);
   const { id } = match.params;
 
   const {
@@ -83,16 +44,37 @@ const Exam = ({ match, history }) => {
   const [submitQuestions] = useMutation(SUBMIT_QUESTIONS);
 
   let questions = [];
+  let numberOfAttempts = 0;
 
   if (!loading) {
-    if (data.getAllQuestions.data && !numberOfAttempts) {
+    if (
+      data.getAllQuestions.data && data.getAllQuestions.numberOfAttempts
+    ) {
       const {
         getAllQuestions: { data: questionsList = [], numberOfAttempts: attempts = 0 } = {},
       } = data;
       questions = questionsList;
-      setNumberOfAttempts(attempts);
+      numberOfAttempts = attempts;
     }
   }
+  useEffect(() => {
+    if (minutes > 1 && !(Number(maximumAttempts) === numberOfAttempts)) {
+      setTimeout(() => {
+        setMinutes(minutes - 1);
+        localStorage.setItem('time', minutes);
+      }, 60000);
+    }
+    if (viewTimer && seconds === 0 && !(Number(maximumAttempts) === numberOfAttempts)) {
+      setSeconds(59);
+    }
+    if (viewTimer && seconds >= 1 && !(Number(maximumAttempts) === numberOfAttempts)) {
+      setTimeout(() => {
+        setSeconds(seconds - 1);
+        localStorage.setItem('seconds', seconds);
+      }, 1000);
+    }
+  }, [seconds, minutes]);
+  console.log('hello');
 
   const handleEdit = (questionDetails) => {
     setEditOpen(true);
@@ -204,16 +186,30 @@ const Exam = ({ match, history }) => {
 
   if (Number(maximumAttempts) === numberOfAttempts) {
     return (
-      <Typography>
-        Attempt Limit Reached
+      <Typography component="div" align="center">
+        <Typography variant="h4">
+          Attempt Limit Reached
+        </Typography>
+        <Typography>
+          <Button className={classes.spacing} variant="contained" color="primary" onClick={handleBack}>
+            Back
+          </Button>
+        </Typography>
       </Typography>
     );
   }
 
   if (!questions.length) {
     return (
-      <Typography>
-        No Questions
+      <Typography component="div" align="center">
+        <Typography variant="h4">
+          No Questions !!!
+        </Typography>
+        <Typography>
+          <Button className={classes.spacing} variant="contained" color="primary" onClick={handleBack}>
+            Back
+          </Button>
+        </Typography>
       </Typography>
     );
   }

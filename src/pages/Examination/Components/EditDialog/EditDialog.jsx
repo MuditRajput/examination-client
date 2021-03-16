@@ -2,34 +2,35 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   DialogActions, Dialog, DialogContentText, DialogContent, CircularProgress,
-  DialogTitle, Button, TextField, makeStyles,
+  DialogTitle, Button, TextField,
 } from '@material-ui/core';
 import * as yup from 'yup';
-
-export const useStyle = makeStyles(() => ({
-  margin: {
-    margin: '10px 0',
-  },
-}));
+import { useStyles } from '../../style';
 
 const EditExamination = (props) => {
   const {
     open, onClose, onSubmit, defaultValues, loading,
   } = props;
 
-  const { subject, description, maximumMarks } = defaultValues;
-  const classes = useStyle();
+  const {
+    subject, description, maximumMarks, time, maxAttempts,
+  } = defaultValues;
+  const classes = useStyles();
   const schema = yup.object().shape({
     subject: yup.string().required('Subject is required').min(3, 'should have more then 3 characters'),
     description: yup.string(),
     maximumMarks: yup.number(),
+    time: yup.number().required('Time is required'),
+    maxAttempts: yup.number().required('Maximum number of attepts is required'),
   });
 
   const [state, setstate] = useState({
-    subject, description, maximumMarks,
+    subject, description, maximumMarks, time, maxAttempts,
   });
 
-  const [onBlur, setBlur] = useState({});
+  const [onBlur, setBlur] = useState({
+    subject: true, description: true, maximumMarks: true, time: true, maxAttempts: true,
+  });
 
   const [schemaErrors, setSchemaErrors] = useState({});
 
@@ -77,7 +78,7 @@ const EditExamination = (props) => {
   const handleOnSubmit = () => {
     onSubmit(state);
     setstate({
-      subject: '', description: '', maximumMarks: '',
+      subject: '', description: '', maximumMarks: '', time: '', maxAttempts: '',
     });
     setBlur({});
   };
@@ -122,18 +123,47 @@ const EditExamination = (props) => {
           label="Description"
           variant="outlined"
         />
-        <TextField
-          size="small"
-          fullWidth
-          defaultValue={maximumMarks}
-          error={!!getError('maximumMarks')}
-          helperText={getError('maximumMarks')}
-          className={classes.margin}
-          onChange={(input) => handleInputField('maximumMarks', input)}
-          onBlur={() => handleBlur('maximumMarks')}
-          label="Maximum Marks"
-          variant="outlined"
-        />
+        <div className={classes.flexRow}>
+          <TextField
+            size="small"
+            fullWidth
+            defaultValue={maximumMarks}
+            error={!!getError('maximumMarks')}
+            helperText={getError('maximumMarks')}
+            onChange={(input) => handleInputField('maximumMarks', input)}
+            onBlur={() => handleBlur('maximumMarks')}
+            label="Maximum Marks"
+            variant="outlined"
+          />
+          <TextField
+            id="outlined-number"
+            type="number"
+            variant="outlined"
+            size="small"
+            fullWidth
+            defaultValue={time}
+            error={!!getError('time')}
+            helperText={getError('time')}
+            className={classes.flexElements}
+            onChange={(input) => handleInputField('time', input)}
+            onBlur={() => handleBlur('time')}
+            label="Time (in minutes)"
+          />
+          <TextField
+            id="outlined-number"
+            type="number"
+            variant="outlined"
+            size="small"
+            fullWidth
+            defaultValue={maxAttempts}
+            error={!!getError('maxAttempts')}
+            helperText={getError('maxAttempts')}
+            className={classes.flexElements}
+            onChange={(input) => handleInputField('maxAttempts', input)}
+            onBlur={() => handleBlur('maxAttempts')}
+            label="Maximum number of attempts"
+          />
+        </div>
       </DialogContent>
       <DialogActions className={classes.margin}>
         <Button autoFocus onClick={onClose} color="secondary">

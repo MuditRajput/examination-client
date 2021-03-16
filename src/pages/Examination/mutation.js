@@ -18,8 +18,8 @@ export const CREATE_EXAMINATION = gql`
 `;
 
 export const UPDATE_EXAMINATION = gql`
-  mutation UpdateExamination($originalId: ID!, $subject: String!, $description: String, $maximumMarks: String) {
-  updateExamination(payload: {originalId: $originalId, dataToUpdate: {subject: $subject, description: $description, maximumMarks: $maximumMarks } }) {
+  mutation UpdateExamination($originalId: ID!, $subject: String!, $description: String, $maximumMarks: String, $maxAttempts: String! $time: String!) {
+  updateExamination(payload: {originalId: $originalId, dataToUpdate: {subject: $subject, description: $description, maximumMarks: $maximumMarks, maxAttempts: $maxAttempts time: $time } }) {
     data {
       subject
       originalId

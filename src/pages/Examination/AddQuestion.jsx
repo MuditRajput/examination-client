@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
-  TextField, makeStyles, Button, Container, IconButton, Paper,
+  TextField, Button, Container, IconButton, Paper,
   Typography, RadioGroup, FormControlLabel, Radio, InputAdornment,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
@@ -16,22 +16,7 @@ import { GETALL_QUESTIONS } from './query';
 import { SnackbarContext } from '../../contexts';
 import { EditQuestion } from './Components/EditQuestion';
 import { DeleteDialog } from './Components/DeleteDialog';
-
-export const useStyle = makeStyles((theme) => ({
-  margin: {
-    margin: '10px 0px',
-  },
-  optionsMargin: {
-    margin: '10px 10px 10px 0px',
-  },
-  question: {
-    marginBottom: theme.spacing(3),
-    padding: theme.spacing(2),
-  },
-  options: {
-    marginLeft: theme.spacing(2),
-  },
-}));
+import { useStyles } from './style';
 
 const AddQuestions = (props) => {
   const { match, history } = props;
@@ -168,6 +153,7 @@ const AddQuestions = (props) => {
           openSnackbar('error', message);
         }
       }
+      openSnackbar('error', 'Please enter correct values');
     } catch {
       openSnackbar('error', 'Something went wrong');
     }
@@ -191,8 +177,8 @@ const AddQuestions = (props) => {
   const handleBlur = (label) => {
     setBlur({ ...onBlur, [label]: true });
   };
-  const closeOption = (arrayOfOptions) => {
-    arrayOfOptions.pop();
+  const closeOption = (arrayOfOptions, index) => {
+    arrayOfOptions.splice(index, 1);
     return [...arrayOfOptions];
   };
 
@@ -212,11 +198,91 @@ const AddQuestions = (props) => {
     setState(questionList);
   };
 
-  const classes = useStyle();
+  const renderTextField = (input, className, fieldName, Label, optionIndex) => (
+    <TextField
+      size="small"
+      {...input}
+      fullWidth={!(optionIndex >= 0)}
+      className={className}
+      error={!!getError(fieldName)}
+      helperText={getError(fieldName)}
+      onBlur={() => handleBlur(fieldName)}
+      label={Label}
+      variant="outlined"
+      InputProps={(optionIndex >= 0) ? {
+        endAdornment: <InputAdornment position="end"><IconButton onClick={() => setOptionInputArray(closeOption(optionInputArray, optionIndex))} size="small"><CloseIcon style={{ fontSize: 20 }} opacity="0.6" /></IconButton></InputAdornment>,
+      } : ''}
+    />
+  );
+
+  const classes = useStyles();
   return (
     <SnackbarContext.Consumer>
       {({ openSnackbar }) => (
         <Container>
+          <EditQuestion
+            open={editOpen}
+            defaultValues={details}
+            onSubmit={(input) => handleEditSubmit(input, openSnackbar)}
+            onClose={handleEditClose}
+          />
+          <DeleteDialog
+            open={deleteOpen}
+            onClose={deleteOpenAndClose}
+            onDelete={() => handleDelete(openSnackbar)}
+          />
+          <Form
+            onSubmit={handleSubmitQuestion}
+            render={({ handleSubmit }) => (
+              <form onSubmit={handleSubmit}>
+                {
+                  inputArray.map((value, index) => (
+                    <div key={`${index + 1}`}>
+                      <Field
+                        name={`question${index}`}
+                        render={({ input }) => (
+                          renderTextField(input, classes.margin, 'question', 'Question')
+                        )}
+                      />
+                      <Field
+                        name={`correct${index}`}
+                        render={({ input }) => (
+                          renderTextField(input, classes.margin, 'correctOption', 'Correct Option')
+                        )}
+                      />
+                      {
+                        optionInputArray.map((arrayValue, optionIndex) => (
+                          <Field
+                            key={`option${index + 1}${optionIndex + 1}`}
+                            name={`option${index}${optionIndex}`}
+                            render={({ input }) => (
+                              renderTextField(input, classes.optionsMargin, '', 'Option', optionIndex)
+                            )}
+                          />
+                        ))
+                      }
+                    </div>
+                  ))
+                }
+                <div>
+                  <Button className={classes.optionsMargin} variant="outlined" onClick={() => setOptionInputArray([...optionInputArray, 1])} color="secondary">
+                    Add More Option Fields
+                  </Button>
+                  <Button className={classes.optionsMargin} variant="outlined" onClick={handleBack} color="secondary">
+                    Close
+                  </Button>
+                </div>
+                <Button fullWidth type="submit" className={classes.buttons} variant="contained" disabled={!isTouched()} color="primary">
+                  Submit
+                </Button>
+              </form>
+            )}
+          />
+          <ConfirmDialog
+            open={confirmOpen}
+            onSubmit={() => submitQuestions(openSnackbar)}
+            onClose={handleConfirmClose}
+          />
           {
             questions.map((questionDetail) => (
               <Paper key={questionDetail.originalId} className={classes.question}>
@@ -248,98 +314,6 @@ const AddQuestions = (props) => {
               </Paper>
             ))
           }
-          <EditQuestion
-            open={editOpen}
-            defaultValues={details}
-            onSubmit={(input) => handleEditSubmit(input, openSnackbar)}
-            onClose={handleEditClose}
-          />
-          <DeleteDialog
-            open={deleteOpen}
-            onClose={deleteOpenAndClose}
-            onDelete={() => handleDelete(openSnackbar)}
-          />
-          <Form
-            onSubmit={handleSubmitQuestion}
-            render={({ handleSubmit }) => (
-              <form onSubmit={handleSubmit}>
-                {
-                  inputArray.map((value, index) => (
-                    <div key={`${index + 1}`}>
-                      <Field
-                        name={`question${index}`}
-                        render={({ input }) => (
-                          <TextField
-                            size="small"
-                            {...input}
-                            fullWidth
-                            className={classes.margin}
-                            error={!!getError('question')}
-                            helperText={getError('question')}
-                            onBlur={() => handleBlur('question')}
-                            label="Question"
-                            variant="outlined"
-                          />
-                        )}
-                      />
-                      <Field
-                        name={`correct${index}`}
-                        render={({ input }) => (
-                          <TextField
-                            size="small"
-                            {...input}
-                            fullWidth
-                            className={classes.margin}
-                            error={!!getError('correctOption')}
-                            helperText={getError('correctOption')}
-                            onBlur={() => handleBlur('correctOption')}
-                            label="Correct Option"
-                            variant="outlined"
-                          />
-                        )}
-                      />
-                      {
-                        optionInputArray.map((arrayValue, optionIndex) => (
-                          <Field
-                            key={`option${index + 1}${optionIndex + 1}`}
-                            name={`option${index}${optionIndex}`}
-                            render={({ input }) => (
-                              <TextField
-                                {...input}
-                                size="small"
-                                className={classes.optionsMargin}
-                                label="Option"
-                                variant="outlined"
-                                InputProps={{
-                                  endAdornment: <InputAdornment position="end"><IconButton onClick={() => setOptionInputArray(closeOption(optionInputArray))} size="small"><CloseIcon style={{ fontSize: 20 }} opacity="0.6" /></IconButton></InputAdornment>,
-                                }}
-                              />
-                            )}
-                          />
-                        ))
-                      }
-                    </div>
-                  ))
-                }
-                <div>
-                  <Button className={classes.optionsMargin} variant="outlined" onClick={() => setOptionInputArray([...optionInputArray, 1])} color="secondary">
-                    Add More Option Fields
-                  </Button>
-                  <Button className={classes.optionsMargin} variant="outlined" onClick={handleBack} color="secondary">
-                    Close
-                  </Button>
-                </div>
-                <Button fullWidth type="submit" className={classes.buttons} variant="contained" disabled={!isTouched()} color="primary">
-                  Submit
-                </Button>
-              </form>
-            )}
-          />
-          <ConfirmDialog
-            open={confirmOpen}
-            onSubmit={() => submitQuestions(openSnackbar)}
-            onClose={handleConfirmClose}
-          />
         </Container>
       )}
     </SnackbarContext.Consumer>

@@ -41,3 +41,9 @@ export const radioOptionsFootball = [{
   value: 'Defender',
 },
 ];
+
+export const instructions = [
+  'Make sure to attempt all questions.',
+  'Exam will auto submit when allotted time is over.',
+  'Limited attempts are allowed per user',
+];

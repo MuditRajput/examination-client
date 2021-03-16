@@ -2,20 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {
   DialogActions, Dialog, CircularProgress,
-  DialogTitle, Button, makeStyles,
+  DialogTitle, Button,
 } from '@material-ui/core';
-
-export const useStyle = makeStyles(() => ({
-  margin: {
-    margin: '10px 0',
-  },
-}));
+import { useStyles } from '../../style';
 
 const ConfirmDialog = (props) => {
   const {
     open, onClose, onSubmit, loading, text,
   } = props;
-  const classes = useStyle();
+  const classes = useStyles();
 
   return (
     <Dialog

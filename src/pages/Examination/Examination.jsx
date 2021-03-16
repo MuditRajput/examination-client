@@ -12,6 +12,7 @@ import { AddExamination } from './Components/AddDialog';
 import { EditExamination } from './Components/EditDialog';
 import { DeleteDialog } from './Components/DeleteDialog';
 import { ConfirmDialog } from './Components/ConfirmDialog';
+import { Instructions } from './Components/Instructions';
 import { GETALL_EXAMINATION } from './query';
 import {
   CREATE_EXAMINATION, UPDATE_EXAMINATION, DELETE_EXAMINATION, ADD_QUESTIONS,
@@ -29,6 +30,8 @@ const Examination = (props) => {
   const [orderBy, setOrderBy] = useState();
   const [questionList, setQuestionList] = useState([]);
   const [confirmAdd, setConfirmAdd] = useState(false);
+  const [selectedId, setSelectedId] = useState('');
+  const [instructionsOpen, setInstructionsOpen] = useState(false);
 
   const {
     data, loading: getAllExaminationLoading, refetch,
@@ -161,8 +164,19 @@ const Examination = (props) => {
 
   const handleSelect = (property) => {
     localStorage.setItem('maxAttempts', (examinations.find((exam) => exam.originalId === property)).maxAttempts);
-    history.push(`${match.path}/${property}`);
+    setSelectedId(property);
+    setInstructionsOpen(true);
     localStorage.setItem('time', (examinations.find((exam) => exam.originalId === property)).time);
+    localStorage.removeItem('seconds');
+  };
+
+  const handleIntructionsClose = () => {
+    setInstructionsOpen(false);
+  };
+
+  const handleIntructionsSubmit = () => {
+    history.push(`${match.path}/${selectedId}`);
+    handleIntructionsClose();
   };
 
   const handleAddQuestions = (questionDetails) => {
@@ -294,6 +308,11 @@ const Examination = (props) => {
             open={confirmAdd}
             onClose={closeConfirm}
             onSubmit={() => submitConfirm(openSnackbar)}
+          />
+          <Instructions
+            open={instructionsOpen}
+            onClose={handleIntructionsClose}
+            onSubmit={handleIntructionsSubmit}
           />
         </>
       )}
