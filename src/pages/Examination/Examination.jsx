@@ -34,7 +34,7 @@ const Examination = (props) => {
   const [instructionsOpen, setInstructionsOpen] = useState(false);
 
   const {
-    data, loading: getAllExaminationLoading, refetch,
+    data = {}, loading: getAllExaminationLoading, refetch,
   } = useQuery(GETALL_EXAMINATION, { variables: {}, fetchPolicy: 'network-only' });
   const EnhancedTable = withLoaderAndMessage(TableComponent);
   let examinations = [];
@@ -231,6 +231,7 @@ const Examination = (props) => {
             loader={getAllExaminationLoading}
             data={examinations}
             dataLength={examinations.length}
+            message="No Exams !!!"
             columns={[
               {
                 field: 'subject',
@@ -243,16 +244,19 @@ const Examination = (props) => {
               {
                 field: 'maximumMarks',
                 label: 'Maximum Marks',
+                align: 'center',
               },
               {
                 field: 'time',
                 label: 'Time',
+                align: 'center',
                 format: (value) => value && `${value} Minutes`,
 
               },
               {
                 field: 'maxAttempts',
                 label: 'Maximum Attempts',
+                align: 'center',
               },
             ]}
             actions={write ? [

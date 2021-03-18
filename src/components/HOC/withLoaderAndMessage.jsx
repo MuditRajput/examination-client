@@ -4,7 +4,9 @@ import { CircularProgress, Typography } from '@material-ui/core';
 
 const withLoaderAndMessage = (WrappedComponent) => {
   const WithLoaderAndMessage = (props) => {
-    const { loader, dataLength, ...rest } = props;
+    const {
+      loader, dataLength, message, ...rest
+    } = props;
     if (loader) {
       return (
         <Typography component="div" align="center">
@@ -14,7 +16,7 @@ const withLoaderAndMessage = (WrappedComponent) => {
     }
     if (!dataLength) {
       return (
-        <Typography align="center" variant="h3">OOPS!, No More Trainees</Typography>
+        <Typography align="center" variant="h3">{message}</Typography>
       );
     }
     return (
@@ -25,11 +27,13 @@ const withLoaderAndMessage = (WrappedComponent) => {
   WithLoaderAndMessage.propTypes = {
     loader: PropTypes.bool,
     dataLength: PropTypes.number,
+    message: PropTypes.string,
   };
 
   WithLoaderAndMessage.defaultProps = {
     loader: false,
     dataLength: 0,
+    message: 'No Data to display',
   };
 
   return WithLoaderAndMessage;

@@ -23,10 +23,7 @@ const EditExamination = (props) => {
     time: yup.number().required('Time is required'),
     maxAttempts: yup.number().required('Maximum number of attepts is required'),
   });
-
-  const [state, setstate] = useState({
-    subject, description, maximumMarks, time, maxAttempts,
-  });
+  const [state, setstate] = useState({});
 
   const [onBlur, setBlur] = useState({
     subject: true, description: true, maximumMarks: true, time: true, maxAttempts: true,
@@ -62,6 +59,12 @@ const EditExamination = (props) => {
   };
 
   useEffect(() => {
+    setstate({
+      subject, description, maximumMarks, time, maxAttempts,
+    });
+  }, [defaultValues]);
+
+  useEffect(() => {
     handleValidate();
   }, [state]);
 
@@ -75,11 +78,15 @@ const EditExamination = (props) => {
     });
   };
 
+  const handleOnClose = () => {
+    setstate({});
+    setBlur({});
+    onClose();
+  };
+
   const handleOnSubmit = () => {
     onSubmit(state);
-    setstate({
-      subject: '', description: '', maximumMarks: '', time: '', maxAttempts: '',
-    });
+    setstate({});
     setBlur({});
   };
 
@@ -166,7 +173,7 @@ const EditExamination = (props) => {
         </div>
       </DialogContent>
       <DialogActions className={classes.margin}>
-        <Button autoFocus onClick={onClose} color="secondary">
+        <Button autoFocus onClick={handleOnClose} color="secondary">
           Cancel
         </Button>
         <Button disabled={hasErrors() || !isTouched() || loading} onClick={() => handleOnSubmit(state)} color="primary">

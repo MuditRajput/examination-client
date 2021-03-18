@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import { useQuery } from '@apollo/client';
@@ -10,18 +9,7 @@ import TableRow from '@material-ui/core/TableRow';
 import moment from 'moment';
 import { Typography, TableContainer, Paper } from '@material-ui/core';
 import { GETALL_RESULTS } from './query';
-
-const useStyles = makeStyles((theme) => ({
-  table: {
-    margin: '10px 0px',
-  },
-  rowHover: {
-    '&:hover': {
-      backgroundColor: theme.palette.action.disabledBackground,
-      cursor: 'pointer',
-    },
-  },
-}));
+import { useStyles } from './style';
 
 const Results = ({ history }) => {
   const classes = useStyles();
@@ -83,7 +71,7 @@ const Results = ({ history }) => {
               <TableRow
                 onClick={() => goToDetail(result.originalId)}
                 className={classes.rowHover}
-                key={result.id}
+                key={result.originalId}
               >
                 <TableCell>{result.questionSet}</TableCell>
                 <TableCell>{getDateFormatted(result.createdAt)}</TableCell>

@@ -15,7 +15,7 @@ const AddExamination = (props) => {
   const schema = yup.object().shape({
     subject: yup.string().required('Subject is required').min(3, 'should have more then 3 characters'),
     description: yup.string(),
-    maximumMarks: yup.number(),
+    maximumMarks: yup.string(),
     time: yup.number().required('Time is required'),
     maxAttempts: yup.number().required('Maximum number of attepts is required'),
   });

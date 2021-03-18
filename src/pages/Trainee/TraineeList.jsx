@@ -241,6 +241,7 @@ const TraineeList = (props) => {
             data={trainees}
             loader={getAllTraineeLoading}
             dataLength={traineeCount}
+            message="OOPS!, No More Trainees"
             columns={[
               {
                 field: 'name',

@@ -25,6 +25,7 @@ export const GETALL_QUESTIONS = gql`
       question
       options
       correctOption
+      optionType
       originalId
     }
     numberOfAttempts

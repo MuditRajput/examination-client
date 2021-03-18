@@ -1,39 +1,14 @@
 import React from 'react';
 import {
-  RadioGroup, Paper, Typography, Button, makeStyles, FormControlLabel,
-  Radio, Container,
+  RadioGroup, Paper, Typography, Button, FormControlLabel,
+  Radio, Container, Checkbox, CircularProgress,
 } from '@material-ui/core';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@apollo/client';
 import { GETONE_RESULT, GETALL_QUESTIONS } from './query';
-
-const useStyles = makeStyles((theme) => ({
-  buttonBack: {
-    margin: '10px',
-  },
-  question: {
-    marginBottom: theme.spacing(3),
-    padding: theme.spacing(2),
-  },
-  options: {
-    marginLeft: theme.spacing(2),
-  },
-  resultOption: {
-    background: '#efefef',
-    padding: '10px',
-    marginTop: '10px',
-  },
-  correctOption: {
-    borderRadius: '3px',
-    background: '#98de8b80',
-  },
-  wrongOption: {
-    borderRadius: '3px',
-    background: '#eec5c5',
-  },
-}
-));
+import { useStyles } from './style';
+import { NoMatch } from '../NoMatch';
 
 const ResultDetail = (props) => {
   const classes = useStyles();
@@ -57,27 +32,42 @@ const ResultDetail = (props) => {
     data, loading: getQuestionLoading,
   } = useQuery(GETALL_QUESTIONS, {
     variables: {
-      id: resultData ? resultData.getOneResult.data.questionSet : '',
+      id: resultData ? resultData.getOneResult.data?.questionSet : '',
     },
     fetchPolicy: 'network-only',
   });
 
   if (!getQuestionLoading && !questions.length) {
-    if (data.getAllQuestions.data) {
+    if (data?.getAllQuestions.data) {
       const { getAllQuestions: { data: questionsList = [] } = {} } = data;
       questions = questionsList;
     }
   }
 
   const colortype = (originalId, option) => {
-    if ((result[originalId]?.[0]) && (result[originalId]?.[2] === option)) {
+    if ((result[originalId]?.[0])
+    && (JSON.stringify(result[originalId]?.[2]) === JSON.stringify([option])
+    || result[originalId]?.[2]?.includes(option))) {
       return classes.correctOption;
     }
-    if ((result[originalId]?.[0]) === false && (result[originalId]?.[2] === option)) {
+    if ((result[originalId]?.[0]) === false
+    && (JSON.stringify(result[originalId]?.[2]) === JSON.stringify([option])
+    || result[originalId]?.[2]?.includes(option))) {
       return classes.wrongOption;
     }
     return '';
   };
+
+  if (loading || getQuestionLoading) {
+    return (
+      <Typography component="div" align="center">
+        <CircularProgress />
+      </Typography>
+    );
+  }
+  if (!Object.keys(result).length) {
+    return (<NoMatch />);
+  }
 
   return (
     <Container>
@@ -96,7 +86,17 @@ const ResultDetail = (props) => {
             <RadioGroup className={classes.options} aria-label="answer" name="solution">
               {
                 questionDetail.options.map((option) => (
-                  <FormControlLabel checked={(result[questionDetail.originalId]?.[2] === option)} className={colortype(questionDetail.originalId, option)} disabled key={`${questionDetail.originalId}${option}`} value={option} control={<Radio />} label={option} />
+                  <FormControlLabel
+                    checked={result[questionDetail.originalId]?.[2]?.includes(option)}
+                    className={colortype(questionDetail.originalId, option)}
+                    disabled
+                    key={`${questionDetail.originalId}${option}`}
+                    value={option}
+                    control={
+                      (result[questionDetail.originalId][1].length === 1) ? <Radio /> : <Checkbox />
+                    }
+                    label={option}
+                  />
                 ))
               }
             </RadioGroup>

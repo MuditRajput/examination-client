@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   RadioGroup, FormControlLabel, Radio, Container, Typography, IconButton,
-  Paper, Button, CircularProgress,
+  Paper, Button, CircularProgress, Checkbox,
 } from '@material-ui/core';
 import { useQuery, useMutation } from '@apollo/client';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { EditQuestion } from './Components/EditQuestion';
 import { DeleteDialog } from './Components/DeleteDialog';
+import { ConfirmDialog } from './Components/ConfirmDialog';
 import { GETALL_QUESTIONS } from './query';
 import { UPDATE_QUESTIONS, DELETE_QUESTIONS, SUBMIT_QUESTIONS } from './mutation';
 import { SnackbarContext } from '../../contexts';
@@ -26,6 +27,8 @@ const Exam = ({ match, history }) => {
   const [seconds, setSeconds] = useState(localStorage.getItem('seconds') ? Number(localStorage.getItem('seconds') - 1) : 59);
   const [minutes, setMinutes] = useState(Number(localStorage.getItem('time') - 1) || 0);
   const [marks, setMarks] = useState(0);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [lastMinuteFlag, setLastMinuteFlag] = useState(false);
 
   const maximumAttempts = localStorage.getItem('maxAttempts');
   const { id } = match.params;
@@ -47,22 +50,23 @@ const Exam = ({ match, history }) => {
   let numberOfAttempts = 0;
 
   if (!loading) {
-    if (
-      data.getAllQuestions.data && data.getAllQuestions.numberOfAttempts
-    ) {
-      const {
-        getAllQuestions: { data: questionsList = [], numberOfAttempts: attempts = 0 } = {},
-      } = data;
-      questions = questionsList;
-      numberOfAttempts = attempts;
-    }
+    const {
+      getAllQuestions: { data: questionsList = [], numberOfAttempts: attempts = 0 } = {},
+    } = data;
+    questions = questionsList;
+    numberOfAttempts = attempts;
   }
   useEffect(() => {
-    if (minutes > 1 && !(Number(maximumAttempts) === numberOfAttempts)) {
+    if (minutes >= 1 && !(Number(maximumAttempts) === numberOfAttempts)) {
       setTimeout(() => {
         setMinutes(minutes - 1);
         localStorage.setItem('time', minutes);
       }, 60000);
+    }
+    if (minutes === 0) {
+      setTimeout(() => {
+        setLastMinuteFlag(true);
+      }, 5000);
     }
     if (viewTimer && seconds === 0 && !(Number(maximumAttempts) === numberOfAttempts)) {
       setSeconds(59);
@@ -74,7 +78,6 @@ const Exam = ({ match, history }) => {
       }, 1000);
     }
   }, [seconds, minutes]);
-  console.log('hello');
 
   const handleEdit = (questionDetails) => {
     setEditOpen(true);
@@ -131,7 +134,27 @@ const Exam = ({ match, history }) => {
   };
 
   const handleOptionField = (input, originalId) => {
-    setState({ ...state, [originalId]: input.target.value });
+    setState({ ...state, [originalId]: [input.target.value] });
+  };
+
+  const removeElement = (array, value) => {
+    const index = array.indexOf(value);
+    if (index > -1) {
+      array.splice(index, 1);
+    }
+    return [...array];
+  };
+
+  const handleCheckboxField = (input, originalId) => {
+    if (!state[originalId] || !state[originalId].length) {
+      setState({ ...state, [originalId]: [input.target.value] });
+      return;
+    }
+    if (state[originalId].includes(input.target.value)) {
+      setState({ ...state, [originalId]: removeElement(state[originalId], input.target.value) });
+    } else {
+      setState({ ...state, [originalId]: [...state[originalId], input.target.value] });
+    }
   };
 
   const handleBack = () => {
@@ -140,7 +163,11 @@ const Exam = ({ match, history }) => {
 
   const submitted = Object.keys(result).length !== 0;
 
-  const handleSubmit = async (openSnackbar, message) => {
+  const handleConfirmClose = () => {
+    setConfirmOpen(false);
+  };
+
+  const handleConfirmSubmit = async (openSnackbar, message) => {
     try {
       const response = await submitQuestions({
         variables: { questionSet: id, answersList: state },
@@ -160,6 +187,7 @@ const Exam = ({ match, history }) => {
         const correctValues = resultValues.filter((value) => (value[0] || ''));
         setMarks(correctValues.length);
         setResult(resultResponse);
+        setConfirmOpen(false);
       } else {
         openSnackbar('error', 'Retry');
       }
@@ -168,11 +196,19 @@ const Exam = ({ match, history }) => {
     }
   };
 
+  const handleSubmit = () => {
+    setConfirmOpen(true);
+  };
+
   const colortype = (originalId, option) => {
-    if ((result[originalId]?.[0]) && (state[originalId] === option)) {
+    if ((result[originalId]?.[0])
+    && (JSON.stringify(state[originalId]) === JSON.stringify([option])
+    || state[originalId]?.includes(option))) {
       return classes.correctOption;
     }
-    if ((result[originalId]?.[0]) === false && (state[originalId] === option)) {
+    if ((result[originalId]?.[0]) === false
+    && (JSON.stringify(state[originalId]) === JSON.stringify([option])
+    || state[originalId]?.includes(option))) {
       return classes.wrongOption;
     }
     return '';
@@ -227,7 +263,7 @@ const Exam = ({ match, history }) => {
                 {Object.keys(result).length}
               </Typography>
             )
-            : <Timer minutes={minutes} seconds={seconds} onComplete={() => handleSubmit(openSnackbar, 'Timeout !!!')} />}
+            : <Timer lastMinuteFlag={lastMinuteFlag} minutes={minutes} seconds={seconds} onComplete={() => handleConfirmSubmit(openSnackbar, 'Timeout !!!')} />}
           {
             questions.map((questionDetail) => (
               <Paper key={questionDetail.originalId} className={classes.question}>
@@ -253,7 +289,14 @@ const Exam = ({ match, history }) => {
                   {
                     questionDetail.options.map((option) => (
                       <>
-                        <FormControlLabel className={colortype(questionDetail.originalId, option)} disabled={submitted} key={option} value={option} control={<Radio color="primary" />} label={option} />
+                        <FormControlLabel
+                          className={colortype(questionDetail.originalId, option)}
+                          disabled={submitted}
+                          key={option}
+                          value={option}
+                          control={(questionDetail.optionType === 'radio') ? <Radio color="primary" /> : <Checkbox onClick={(input) => handleCheckboxField(input, questionDetail.originalId)} color="primary" />}
+                          label={option}
+                        />
                       </>
                     ))
                   }
@@ -265,7 +308,7 @@ const Exam = ({ match, history }) => {
                       <Typography color="textPrimary" component="i">
                         {'Correct Answer:   '}
                       </Typography>
-                      {result[questionDetail.originalId][1]}
+                      {result[questionDetail.originalId][1].map((correct) => ` ${correct} `)}
                     </Typography>
                   )
                 }
@@ -283,10 +326,16 @@ const Exam = ({ match, history }) => {
             onClose={deleteOpenAndClose}
             onDelete={() => handleDelete(openSnackbar)}
           />
+          <ConfirmDialog
+            open={confirmOpen}
+            onClose={handleConfirmClose}
+            onSubmit={() => handleConfirmSubmit(openSnackbar)}
+            text="SUBMIT EXAM"
+          />
           {
             !submitted
             && (
-              <Button variant="contained" onClick={() => handleSubmit(openSnackbar)} color="primary">
+              <Button variant="contained" onClick={handleSubmit} color="primary">
                 Submit
               </Button>
             )

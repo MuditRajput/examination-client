@@ -4,12 +4,14 @@ import TimerIcon from '@material-ui/icons/Timer';
 import { Typography } from '@material-ui/core';
 
 const Timer = (props) => {
-  const { minutes: totalMinutes, onComplete, seconds } = props;
+  const {
+    minutes: totalMinutes, lastMinuteFlag, onComplete, seconds,
+  } = props;
 
   const hours = Math.floor(totalMinutes / 60);
   const minutes = totalMinutes % 60;
 
-  if (seconds === 0 && minutes === 0) {
+  if (lastMinuteFlag && seconds === 0 && minutes === 0) {
     onComplete();
   }
 
@@ -31,6 +33,7 @@ Timer.propTypes = {
   minutes: PropTypes.number,
   seconds: PropTypes.number,
   onComplete: PropTypes.func.isRequired,
+  lastMinuteFlag: PropTypes.bool.isRequired,
 };
 
 Timer.defaultProps = {

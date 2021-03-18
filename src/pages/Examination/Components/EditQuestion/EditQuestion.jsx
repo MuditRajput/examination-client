@@ -1,24 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
-  TextField, Button, Dialog, makeStyles, DialogContent, DialogActions,
+  TextField, Button, Dialog, DialogContent, DialogActions,
   DialogTitle,
 } from '@material-ui/core';
 import * as yup from 'yup';
-
-export const useStyle = makeStyles(() => ({
-  margin: {
-    margin: '10px 0',
-  },
-}));
+import { useStyles } from '../../style';
 
 const EditQuestion = (props) => {
   const {
     onSubmit, open, onClose, defaultValues,
   } = props;
-  const { options: defaultOptions = [], question: defaultQuestion, correctOption } = defaultValues;
+  const {
+    options: defaultOptions = [], question: defaultQuestion, correctOption = [],
+  } = defaultValues;
+
+  let correctOptionString = '';
+  correctOption.forEach((correct) => {
+    correctOptionString = correctOptionString ? `${correctOptionString}|${correct}` : correct;
+  });
 
   const [question, setQuestion] = useState({});
+
+  const [defaultOptionValues, setDefaultOptionValues] = useState([]);
 
   const [onBlur, setBlur] = useState({});
 
@@ -92,6 +96,14 @@ const EditQuestion = (props) => {
   };
 
   useEffect(() => {
+    if ((!defaultOptionValues.length
+      && defaultOptions.length)
+      || !(JSON.stringify(defaultOptionValues) === JSON.stringify(defaultOptions))) {
+      setDefaultOptionValues(defaultOptions);
+    }
+  }, [defaultOptions]);
+
+  useEffect(() => {
     if (Object.values(options).length) {
       setQuestion({
         ...question, options: (Object.values(options)),
@@ -99,7 +111,7 @@ const EditQuestion = (props) => {
     }
   }, [options]);
 
-  const classes = useStyle();
+  const classes = useStyles();
   return (
     <Dialog
       open={open}
@@ -127,20 +139,19 @@ const EditQuestion = (props) => {
           size="small"
           fullWidth
           className={classes.margin}
-          defaultValue={correctOption}
+          defaultValue={correctOptionString}
           onChange={(input) => handleEditQuestion('correctOption', input)}
           onBlur={() => handleBlur('correctOption')}
           label="Correct Option"
           variant="outlined"
         />
         {
-          defaultOptions.map((option, index) => (
+          defaultOptionValues.map((option, index) => (
             <TextField
               key={option}
               size="small"
-              fullWidth
               defaultValue={option}
-              className={classes.margin}
+              className={classes.optionsMargin}
               onBlur={() => handleBlur('option')}
               onChange={(input) => handleOptionField(`option${index + 1}`, input)}
               label="Option"
@@ -150,6 +161,9 @@ const EditQuestion = (props) => {
         }
       </DialogContent>
       <DialogActions>
+        <Button autoFocus onClick={() => { setDefaultOptionValues([...defaultOptionValues, ' ']); }} color="secondary">
+          Add more options
+        </Button>
         <Button autoFocus onClick={handleClose} color="secondary">
           Close
         </Button>

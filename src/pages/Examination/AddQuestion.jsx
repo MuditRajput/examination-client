@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
-  TextField, Button, Container, IconButton, Paper,
+  TextField, Button, Container, IconButton, Paper, Checkbox,
   Typography, RadioGroup, FormControlLabel, Radio, InputAdornment,
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
@@ -152,8 +152,9 @@ const AddQuestions = (props) => {
         } else {
           openSnackbar('error', message);
         }
+      } else {
+        openSnackbar('error', 'Please enter correct values');
       }
-      openSnackbar('error', 'Please enter correct values');
     } catch {
       openSnackbar('error', 'Something went wrong');
     }
@@ -211,7 +212,7 @@ const AddQuestions = (props) => {
       variant="outlined"
       InputProps={(optionIndex >= 0) ? {
         endAdornment: <InputAdornment position="end"><IconButton onClick={() => setOptionInputArray(closeOption(optionInputArray, optionIndex))} size="small"><CloseIcon style={{ fontSize: 20 }} opacity="0.6" /></IconButton></InputAdornment>,
-      } : ''}
+      } : {}}
     />
   );
 
@@ -307,7 +308,14 @@ const AddQuestions = (props) => {
                 <RadioGroup className={classes.options} aria-label="answer" name="solution">
                   {
                     questionDetail.options.map((option) => (
-                      <FormControlLabel key={option} value={option} control={<Radio color="primary" />} label={option} />
+                      <>
+                        <FormControlLabel
+                          key={option}
+                          value={option}
+                          control={(questionDetail.optionType === 'radio') ? <Radio color="primary" /> : <Checkbox color="primary" />}
+                          label={option}
+                        />
+                      </>
                     ))
                   }
                 </RadioGroup>

@@ -23,10 +23,10 @@ const ConfirmDialog = (props) => {
         {text}
       </DialogTitle>
       <DialogActions className={classes.margin}>
-        <Button autoFocus onClick={onClose} color="primary">
+        <Button autoFocus onClick={onClose} color="secondary">
           Cancel
         </Button>
-        <Button onClick={onSubmit} variant="contained" color="secondary">
+        <Button onClick={onSubmit} variant="contained" color="primary">
           Submit
           { loading && <CircularProgress />}
         </Button>
