@@ -4,16 +4,16 @@ import TimerIcon from '@material-ui/icons/Timer';
 import { Typography } from '@material-ui/core';
 
 const Timer = (props) => {
-  const {
-    minutes: totalMinutes, lastMinuteFlag, onComplete, seconds,
-  } = props;
+  const { seconds: totalSeconds, onComplete } = props;
 
-  const hours = Math.floor(totalMinutes / 60);
-  const minutes = totalMinutes % 60;
-
-  if (lastMinuteFlag && seconds === 0 && minutes === 0) {
+  if (totalSeconds === 0) {
     onComplete();
   }
+
+  const seconds = totalSeconds % 60;
+  const totalMinutes = Math.floor(totalSeconds / 60);
+  const minutes = totalMinutes % 60;
+  const hours = Math.floor(totalMinutes / 60);
 
   return (
     <Typography align="right">
@@ -30,14 +30,11 @@ const Timer = (props) => {
 };
 
 Timer.propTypes = {
-  minutes: PropTypes.number,
   seconds: PropTypes.number,
   onComplete: PropTypes.func.isRequired,
-  lastMinuteFlag: PropTypes.bool.isRequired,
 };
 
 Timer.defaultProps = {
-  minutes: 59,
   seconds: 59,
 };
 

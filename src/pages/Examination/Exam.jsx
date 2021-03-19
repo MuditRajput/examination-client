@@ -24,20 +24,22 @@ const Exam = ({ match, history }) => {
   const [details, setDetails] = useState({});
   const [result, setResult] = useState({});
   const [viewTimer, setViewTimer] = useState(true);
-  const [seconds, setSeconds] = useState(localStorage.getItem('seconds') ? Number(localStorage.getItem('seconds') - 1) : 59);
-  const [minutes, setMinutes] = useState(Number(localStorage.getItem('time') - 1) || 0);
+  const [seconds, setSeconds] = useState();
   const [marks, setMarks] = useState(0);
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [lastMinuteFlag, setLastMinuteFlag] = useState(false);
 
   const maximumAttempts = localStorage.getItem('maxAttempts');
   const { id } = match.params;
+
+  const submitted = Object.keys(result).length !== 0;
 
   const {
     data, loading, refetch,
   } = useQuery(GETALL_QUESTIONS, {
     variables: {
       id,
+      timeLimit: Number(localStorage.getItem('time')) || 0,
+      submitted: `${submitted}`,
     },
     fetchPolicy: 'network-only',
   });
@@ -48,37 +50,26 @@ const Exam = ({ match, history }) => {
 
   let questions = [];
   let numberOfAttempts = 0;
-
   if (!loading) {
     const {
-      getAllQuestions: { data: questionsList = [], numberOfAttempts: attempts = 0 } = {},
+      getAllQuestions: { data: questionsList = [], numberOfAttempts: attempts = 0, timeLeft } = {},
     } = data;
     questions = questionsList;
-    numberOfAttempts = attempts;
+    if (!Object.keys(result).length) {
+      numberOfAttempts = attempts;
+    }
+    if (seconds === undefined) {
+      setSeconds(Math.floor(timeLeft / 1000) - 1);
+    }
   }
+
   useEffect(() => {
-    if (minutes >= 1 && !(Number(maximumAttempts) === numberOfAttempts)) {
-      setTimeout(() => {
-        setMinutes(minutes - 1);
-        localStorage.setItem('time', minutes);
-      }, 60000);
-    }
-    if (minutes === 0) {
-      setTimeout(() => {
-        setLastMinuteFlag(true);
-      }, 5000);
-    }
-    if (viewTimer && seconds === 0 && !(Number(maximumAttempts) === numberOfAttempts)) {
-      setSeconds(59);
-    }
-    if (viewTimer && seconds >= 1 && !(Number(maximumAttempts) === numberOfAttempts)) {
+    if (seconds && !submitted) {
       setTimeout(() => {
         setSeconds(seconds - 1);
-        localStorage.setItem('seconds', seconds);
       }, 1000);
     }
-  }, [seconds, minutes]);
-
+  }, [seconds]);
   const handleEdit = (questionDetails) => {
     setEditOpen(true);
     setDetails(questionDetails);
@@ -161,8 +152,6 @@ const Exam = ({ match, history }) => {
     history.push('/exam');
   };
 
-  const submitted = Object.keys(result).length !== 0;
-
   const handleConfirmClose = () => {
     setConfirmOpen(false);
   };
@@ -177,7 +166,6 @@ const Exam = ({ match, history }) => {
       } = response;
       setViewTimer(false);
       if (resultResponse) {
-        refetch();
         if (message) {
           openSnackbar('error', message);
         } else {
@@ -188,6 +176,7 @@ const Exam = ({ match, history }) => {
         setMarks(correctValues.length);
         setResult(resultResponse);
         setConfirmOpen(false);
+        refetch();
       } else {
         openSnackbar('error', 'Retry');
       }
@@ -263,9 +252,9 @@ const Exam = ({ match, history }) => {
                 {Object.keys(result).length}
               </Typography>
             )
-            : <Timer lastMinuteFlag={lastMinuteFlag} minutes={minutes} seconds={seconds} onComplete={() => handleConfirmSubmit(openSnackbar, 'Timeout !!!')} />}
+            : <Timer seconds={seconds} onComplete={() => handleConfirmSubmit(openSnackbar, 'Timeout !!!')} />}
           {
-            questions.map((questionDetail) => (
+            questions.map((questionDetail, index) => (
               <Paper key={questionDetail.originalId} className={classes.question}>
                 <Typography variant="h6">
                   {questionDetail.question}
@@ -287,17 +276,15 @@ const Exam = ({ match, history }) => {
                 </Typography>
                 <RadioGroup className={classes.options} onChange={(input) => { handleOptionField(input, questionDetail.originalId); }} aria-label="answer" name="solution">
                   {
-                    questionDetail.options.map((option) => (
-                      <>
-                        <FormControlLabel
-                          className={colortype(questionDetail.originalId, option)}
-                          disabled={submitted}
-                          key={option}
-                          value={option}
-                          control={(questionDetail.optionType === 'radio') ? <Radio color="primary" /> : <Checkbox onClick={(input) => handleCheckboxField(input, questionDetail.originalId)} color="primary" />}
-                          label={option}
-                        />
-                      </>
+                    questionDetail.options.map((option, optionIndex) => (
+                      <FormControlLabel
+                        className={colortype(questionDetail.originalId, option)}
+                        disabled={submitted}
+                        key={`${questionDetail.originalId}/${index + 1}/${optionIndex + 1}`}
+                        value={option}
+                        control={(questionDetail.optionType === 'radio') ? <Radio color="primary" /> : <Checkbox onClick={(input) => handleCheckboxField(input, questionDetail.originalId)} color="primary" />}
+                        label={option}
+                      />
                     ))
                   }
                 </RadioGroup>

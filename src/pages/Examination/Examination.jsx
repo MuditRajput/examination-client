@@ -167,7 +167,6 @@ const Examination = (props) => {
     setSelectedId(property);
     setInstructionsOpen(true);
     localStorage.setItem('time', (examinations.find((exam) => exam.originalId === property)).time);
-    localStorage.removeItem('seconds');
   };
 
   const handleIntructionsClose = () => {

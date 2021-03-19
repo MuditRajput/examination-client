@@ -308,14 +308,12 @@ const AddQuestions = (props) => {
                 <RadioGroup className={classes.options} aria-label="answer" name="solution">
                   {
                     questionDetail.options.map((option) => (
-                      <>
-                        <FormControlLabel
-                          key={option}
-                          value={option}
-                          control={(questionDetail.optionType === 'radio') ? <Radio color="primary" /> : <Checkbox color="primary" />}
-                          label={option}
-                        />
-                      </>
+                      <FormControlLabel
+                        key={option}
+                        value={option}
+                        control={(questionDetail.optionType === 'radio') ? <Radio color="primary" /> : <Checkbox color="primary" />}
+                        label={option}
+                      />
                     ))
                   }
                 </RadioGroup>
