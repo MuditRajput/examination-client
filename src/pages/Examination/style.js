@@ -41,4 +41,9 @@ export const useStyles = makeStyles((theme) => ({
   flexElements: {
     marginLeft: '15px',
   },
+  marks: {
+    position: 'absolute',
+    right: '85px',
+    display: 'inline-block',
+  },
 }));

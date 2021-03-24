@@ -46,11 +46,12 @@ const AddQuestions = (props) => {
   const [createQuestions] = useMutation(ADD_QUESTIONS);
 
   let questions = [];
-
+  let totalMarks = 0;
   if (!loading && !questions.length) {
-    if (data.getAllQuestions.data.length) {
+    if (data.getAllQuestions.data) {
       const { getAllQuestions: { data: questionsList = [] } = {} } = data;
       questions = questionsList;
+      questionsList.forEach((question) => { totalMarks += Number(question.marks); });
     }
   }
 
@@ -111,6 +112,7 @@ const AddQuestions = (props) => {
   const schema = yup.object().shape({
     question: yup.string().required('question is required').min(3, 'should have more then 3 characters'),
     correctOption: yup.string().required('correct option is required'),
+    marks: yup.number().required('Marks is required'),
   });
 
   const handleErrors = (errors) => {
@@ -192,7 +194,9 @@ const AddQuestions = (props) => {
           options.push(values[`option${index}${optionIndex}`]);
         }
       });
-      questionList.push({ question: values[`question${index}`], correctOption: values[`correct${index}`], options });
+      questionList.push({
+        question: values[`question${index}`], marks: values[`marks${index}`], correctOption: values[`correct${index}`], options,
+      });
     });
     handleValidate(questionList);
     setConfirmOpen(true);
@@ -245,12 +249,20 @@ const AddQuestions = (props) => {
                           renderTextField(input, classes.margin, 'question', 'Question')
                         )}
                       />
-                      <Field
-                        name={`correct${index}`}
-                        render={({ input }) => (
-                          renderTextField(input, classes.margin, 'correctOption', 'Correct Option')
-                        )}
-                      />
+                      <div className={classes.flexRow}>
+                        <Field
+                          name={`correct${index}`}
+                          render={({ input }) => (
+                            renderTextField(input, '', 'correctOption', 'Correct Option')
+                          )}
+                        />
+                        <Field
+                          name={`marks${index}`}
+                          render={({ input }) => (
+                            renderTextField(input, classes.flexElements, 'marks', 'Marks')
+                          )}
+                        />
+                      </div>
                       {
                         optionInputArray.map((arrayValue, optionIndex) => (
                           <Field
@@ -284,11 +296,17 @@ const AddQuestions = (props) => {
             onSubmit={() => submitQuestions(openSnackbar)}
             onClose={handleConfirmClose}
           />
+          <Typography align="right" variant="h4">
+            {` Maximum Marks: ${totalMarks}`}
+          </Typography>
           {
             questions.map((questionDetail) => (
               <Paper key={questionDetail.originalId} className={classes.question}>
                 <Typography variant="h6">
                   {questionDetail.question}
+                  <Typography className={classes.marks} align="right">
+                    {`${questionDetail.marks} Marks`}
+                  </Typography>
                 </Typography>
                 <Typography align="right">
                   {

@@ -38,6 +38,7 @@ export const GETALL_QUESTIONS = gql`
     data{
       question
       options
+      marks
       correctOption
       originalId
     }

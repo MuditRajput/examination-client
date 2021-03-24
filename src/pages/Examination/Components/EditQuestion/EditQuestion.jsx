@@ -12,7 +12,7 @@ const EditQuestion = (props) => {
     onSubmit, open, onClose, defaultValues,
   } = props;
   const {
-    options: defaultOptions = [], question: defaultQuestion, correctOption = [],
+    options: defaultOptions = [], question: defaultQuestion, correctOption = [], marks = 0,
   } = defaultValues;
 
   let correctOptionString = '';
@@ -34,6 +34,7 @@ const EditQuestion = (props) => {
   const schema = yup.object().shape({
     question: yup.string().required('question is required').min(3, 'should have more then 3 characters'),
     correctOption: yup.string().required('correct option is required'),
+    marks: yup.number().required('Marks is required'),
   });
 
   const handleErrors = (errors) => {
@@ -96,6 +97,15 @@ const EditQuestion = (props) => {
   };
 
   useEffect(() => {
+    setQuestion({
+      defaultQuestion, correctOption, marks, defaultOptions,
+    });
+    setBlur({
+      question: true, correctOption: true, marks: true,
+    });
+  }, [defaultValues]);
+
+  useEffect(() => {
     if ((!defaultOptionValues.length
       && defaultOptions.length)
       || !(JSON.stringify(defaultOptionValues) === JSON.stringify(defaultOptions))) {
@@ -135,16 +145,27 @@ const EditQuestion = (props) => {
           label="Question"
           variant="outlined"
         />
-        <TextField
-          size="small"
-          fullWidth
-          className={classes.margin}
-          defaultValue={correctOptionString}
-          onChange={(input) => handleEditQuestion('correctOption', input)}
-          onBlur={() => handleBlur('correctOption')}
-          label="Correct Option"
-          variant="outlined"
-        />
+        <div className={classes.flexRow}>
+          <TextField
+            size="small"
+            fullWidth
+            defaultValue={correctOptionString}
+            onChange={(input) => handleEditQuestion('correctOption', input)}
+            onBlur={() => handleBlur('correctOption')}
+            label="Correct Option"
+            variant="outlined"
+          />
+          <TextField
+            size="small"
+            fullWidth
+            className={classes.flexElements}
+            defaultValue={marks}
+            onChange={(input) => handleEditQuestion('marks', input)}
+            onBlur={() => handleBlur('marks')}
+            label="Marks"
+            variant="outlined"
+          />
+        </div>
         {
           defaultOptionValues.map((option, index) => (
             <TextField

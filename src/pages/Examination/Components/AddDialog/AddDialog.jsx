@@ -15,13 +15,12 @@ const AddExamination = (props) => {
   const schema = yup.object().shape({
     subject: yup.string().required('Subject is required').min(3, 'should have more then 3 characters'),
     description: yup.string(),
-    maximumMarks: yup.string(),
     time: yup.number().required('Time is required'),
     maxAttempts: yup.number().required('Maximum number of attepts is required'),
   });
 
   const [state, setstate] = useState({
-    subject: '', description: '', maximumMarks: '', time: '', maxAttempts: '',
+    subject: '', description: '', time: '', maxAttempts: '',
   });
 
   const [onBlur, setBlur] = useState({});
@@ -72,14 +71,14 @@ const AddExamination = (props) => {
   const handleOnSubmit = () => {
     onSubmit(state);
     setstate({
-      subject: '', description: '', maximumMarks: '', time: '', maxAttempts: '',
+      subject: '', description: '', time: '', maxAttempts: '',
     });
     setBlur({});
   };
 
   const handleClose = () => {
     setstate({
-      subject: '', description: '', maximumMarks: '', time: '', maxAttempts: '',
+      subject: '', description: '', time: '', maxAttempts: '',
     });
     setBlur({});
     onClose();
@@ -125,16 +124,6 @@ const AddExamination = (props) => {
         />
         <div className={classes.flexRow}>
           <TextField
-            size="small"
-            fullWidth
-            error={!!getError('maximumMarks')}
-            helperText={getError('maximumMarks')}
-            onChange={(input) => handleInputField('maximumMarks', input)}
-            onBlur={() => handleBlur('maximumMarks')}
-            label="Maximum Marks"
-            variant="outlined"
-          />
-          <TextField
             id="outlined-number"
             type="number"
             variant="outlined"
@@ -142,7 +131,6 @@ const AddExamination = (props) => {
             fullWidth
             error={!!getError('time')}
             helperText={getError('time')}
-            className={classes.flexElements}
             onChange={(input) => handleInputField('time', input)}
             onBlur={() => handleBlur('time')}
             label="Time (in minutes)"

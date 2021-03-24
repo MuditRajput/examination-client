@@ -193,8 +193,8 @@ const Examination = (props) => {
     readXlsxFile(file).then((sheets) => {
       const questions = [];
       sheets.forEach((sheet, index) => {
-        const [question, correctOption, ...rest] = sheet;
-        if (!question || !correctOption) {
+        const [question, correctOption, marks, ...rest] = sheet;
+        if (!question || !correctOption || !marks) {
           openSnackbar('error', `File is missing required field at ${index + 1} line`);
         }
         const options = [];
@@ -207,6 +207,7 @@ const Examination = (props) => {
           {
             question,
             correctOption: `${correctOption}`,
+            marks: `${marks}`,
             options,
           },
         );

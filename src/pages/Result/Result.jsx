@@ -14,7 +14,7 @@ import { useStyles } from './style';
 const Results = ({ history }) => {
   const classes = useStyles();
   const marks = [];
-  const totalMarks = [];
+  const maximumMarks = [];
   const {
     data, loading,
   } = useQuery(GETALL_RESULTS, {
@@ -26,11 +26,17 @@ const Results = ({ history }) => {
     if (data.getAllResult.data) {
       const { getAllResult: { data: resultList = [] } = {} } = data;
       results = resultList;
-      resultList.forEach((result) => {
-        const resultValues = Object.values(result.result);
-        totalMarks.push(resultValues.length);
-        const correctValues = resultValues.filter((value) => (value[0] || ''));
-        marks.push(correctValues.length);
+      console.log(resultList);
+      resultList.forEach(({ result }) => {
+        let obtainedMarks = 0;
+        let totalMarks = 0;
+        Object.values(result).forEach((resultValue) => {
+          obtainedMarks += Number(resultValue[0]);
+          console.log(resultValue);
+          totalMarks += Number(resultValue[3]);
+        });
+        marks.push(obtainedMarks);
+        maximumMarks.push(totalMarks);
       });
     }
   }
@@ -79,7 +85,7 @@ const Results = ({ history }) => {
                   <Typography>
                     {marks[index]}
                     /
-                    {totalMarks[index]}
+                    {maximumMarks[index]}
                   </Typography>
                 </TableCell>
               </TableRow>

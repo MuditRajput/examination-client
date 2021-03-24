@@ -27,19 +27,19 @@ const Exam = ({ match, history }) => {
   const [seconds, setSeconds] = useState();
   const [marks, setMarks] = useState(0);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [numberOfAttempts, setNumberOfAttempts] = useState();
+  const [errorMessage, setErrorMessage] = useState();
 
-  const maximumAttempts = localStorage.getItem('maxAttempts');
+  const maximumAttempts = Number(localStorage.getItem('maxAttempts'));
   const { id } = match.params;
-
   const submitted = Object.keys(result).length !== 0;
-
   const {
     data, loading, refetch,
   } = useQuery(GETALL_QUESTIONS, {
     variables: {
       id,
       timeLimit: Number(localStorage.getItem('time')) || 0,
-      submitted: `${submitted}`,
+      submitted: `${((maximumAttempts === numberOfAttempts) || submitted)}`,
     },
     fetchPolicy: 'network-only',
   });
@@ -48,18 +48,28 @@ const Exam = ({ match, history }) => {
   const [deleteQuestions] = useMutation(DELETE_QUESTIONS);
   const [submitQuestions] = useMutation(SUBMIT_QUESTIONS);
 
+  const handleBack = () => {
+    history.push('/exam');
+  };
+
   let questions = [];
-  let numberOfAttempts = 0;
+  let totalMarks = 0;
   if (!loading) {
     const {
-      getAllQuestions: { data: questionsList = [], numberOfAttempts: attempts = 0, timeLeft } = {},
+      getAllQuestions: {
+        message, status, data: questionsList = [], numberOfAttempts: attempts = 0, timeLeft,
+      } = {},
     } = data;
+    if (status !== 'success' && !errorMessage) {
+      setErrorMessage(message);
+    }
     questions = questionsList;
-    if (!Object.keys(result).length) {
-      numberOfAttempts = attempts;
+    questionsList.forEach((question) => { totalMarks += Number(question.marks); });
+    if (!submitted && numberOfAttempts !== attempts) {
+      setNumberOfAttempts(attempts);
     }
     if (seconds === undefined) {
-      setSeconds(Math.floor(timeLeft / 1000) - 1);
+      setSeconds((Math.floor(timeLeft / 1000) > 0 ? Math.floor(timeLeft / 1000) - 1 : 0));
     }
   }
 
@@ -70,6 +80,7 @@ const Exam = ({ match, history }) => {
       }, 1000);
     }
   }, [seconds]);
+
   const handleEdit = (questionDetails) => {
     setEditOpen(true);
     setDetails(questionDetails);
@@ -148,10 +159,6 @@ const Exam = ({ match, history }) => {
     }
   };
 
-  const handleBack = () => {
-    history.push('/exam');
-  };
-
   const handleConfirmClose = () => {
     setConfirmOpen(false);
   };
@@ -171,9 +178,11 @@ const Exam = ({ match, history }) => {
         } else {
           openSnackbar('success', 'Successfull');
         }
-        const resultValues = Object.values(resultResponse);
-        const correctValues = resultValues.filter((value) => (value[0] || ''));
-        setMarks(correctValues.length);
+        let obtainedMarks = 0;
+        Object.values(resultResponse).forEach((resultValue) => {
+          obtainedMarks += Number(resultValue[0]);
+        });
+        setMarks(obtainedMarks);
         setResult(resultResponse);
         setConfirmOpen(false);
         refetch();
@@ -195,7 +204,7 @@ const Exam = ({ match, history }) => {
     || state[originalId]?.includes(option))) {
       return classes.correctOption;
     }
-    if ((result[originalId]?.[0]) === false
+    if ((result[originalId]?.[0]) === 0
     && (JSON.stringify(state[originalId]) === JSON.stringify([option])
     || state[originalId]?.includes(option))) {
       return classes.wrongOption;
@@ -209,7 +218,7 @@ const Exam = ({ match, history }) => {
     );
   }
 
-  if (Number(maximumAttempts) === numberOfAttempts) {
+  if (maximumAttempts === numberOfAttempts) {
     return (
       <Typography component="div" align="center">
         <Typography variant="h4">
@@ -224,11 +233,11 @@ const Exam = ({ match, history }) => {
     );
   }
 
-  if (!questions.length) {
+  if (errorMessage) {
     return (
       <Typography component="div" align="center">
         <Typography variant="h4">
-          No Questions !!!
+          {errorMessage}
         </Typography>
         <Typography>
           <Button className={classes.spacing} variant="contained" color="primary" onClick={handleBack}>
@@ -249,7 +258,7 @@ const Exam = ({ match, history }) => {
                 Marks Obtained:
                 {marks}
                 /
-                {Object.keys(result).length}
+                {totalMarks}
               </Typography>
             )
             : <Timer seconds={seconds} onComplete={() => handleConfirmSubmit(openSnackbar, 'Timeout !!!')} />}
@@ -258,6 +267,9 @@ const Exam = ({ match, history }) => {
               <Paper key={questionDetail.originalId} className={classes.question}>
                 <Typography variant="h6">
                   {questionDetail.question}
+                  <Typography className={classes.marks} align="right">
+                    {`${questionDetail.marks} Marks`}
+                  </Typography>
                 </Typography>
                 <Typography align="right">
                   {
@@ -278,6 +290,9 @@ const Exam = ({ match, history }) => {
                   {
                     questionDetail.options.map((option, optionIndex) => (
                       <FormControlLabel
+                        checked={
+                          result ? result[questionDetail.originalId]?.[2]?.includes(option) : false
+                        }
                         className={colortype(questionDetail.originalId, option)}
                         disabled={submitted}
                         key={`${questionDetail.originalId}/${index + 1}/${optionIndex + 1}`}

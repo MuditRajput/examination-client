@@ -13,20 +13,19 @@ const EditExamination = (props) => {
   } = props;
 
   const {
-    subject, description, maximumMarks, time, maxAttempts,
+    subject, description, time, maxAttempts,
   } = defaultValues;
   const classes = useStyles();
   const schema = yup.object().shape({
     subject: yup.string().required('Subject is required').min(3, 'should have more then 3 characters'),
     description: yup.string(),
-    maximumMarks: yup.number(),
     time: yup.number().required('Time is required'),
     maxAttempts: yup.number().required('Maximum number of attepts is required'),
   });
   const [state, setstate] = useState({});
 
   const [onBlur, setBlur] = useState({
-    subject: true, description: true, maximumMarks: true, time: true, maxAttempts: true,
+    subject: true, description: true, time: true, maxAttempts: true,
   });
 
   const [schemaErrors, setSchemaErrors] = useState({});
@@ -60,7 +59,7 @@ const EditExamination = (props) => {
 
   useEffect(() => {
     setstate({
-      subject, description, maximumMarks, time, maxAttempts,
+      subject, description, time, maxAttempts,
     });
   }, [defaultValues]);
 
@@ -132,17 +131,6 @@ const EditExamination = (props) => {
         />
         <div className={classes.flexRow}>
           <TextField
-            size="small"
-            fullWidth
-            defaultValue={maximumMarks}
-            error={!!getError('maximumMarks')}
-            helperText={getError('maximumMarks')}
-            onChange={(input) => handleInputField('maximumMarks', input)}
-            onBlur={() => handleBlur('maximumMarks')}
-            label="Maximum Marks"
-            variant="outlined"
-          />
-          <TextField
             id="outlined-number"
             type="number"
             variant="outlined"
@@ -151,7 +139,6 @@ const EditExamination = (props) => {
             defaultValue={time}
             error={!!getError('time')}
             helperText={getError('time')}
-            className={classes.flexElements}
             onChange={(input) => handleInputField('time', input)}
             onBlur={() => handleBlur('time')}
             label="Time (in minutes)"

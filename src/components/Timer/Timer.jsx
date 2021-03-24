@@ -6,7 +6,7 @@ import { Typography } from '@material-ui/core';
 const Timer = (props) => {
   const { seconds: totalSeconds, onComplete } = props;
 
-  if (totalSeconds === 0) {
+  if (totalSeconds <= 0) {
     onComplete();
   }
 

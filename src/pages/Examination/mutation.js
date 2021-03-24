@@ -1,14 +1,13 @@
 import { gql } from '@apollo/client';
 
 export const CREATE_EXAMINATION = gql`
-  mutation CreateTrainee($subject: String!, $description: String, $maximumMarks: String, $maxAttempts: String! $time: String!) {
-  createExamination(subject: $subject, description: $description, maximumMarks: $maximumMarks, maxAttempts: $maxAttempts time: $time){
+  mutation CreateTrainee($subject: String!, $description: String, $maxAttempts: String! $time: String!) {
+  createExamination(subject: $subject, description: $description, maxAttempts: $maxAttempts time: $time){
     status
     message
     data{
       subject
       description
-      maximumMarks
       originalId
       time
       maxAttempts
@@ -18,8 +17,8 @@ export const CREATE_EXAMINATION = gql`
 `;
 
 export const UPDATE_EXAMINATION = gql`
-  mutation UpdateExamination($originalId: ID!, $subject: String!, $description: String, $maximumMarks: String, $maxAttempts: String! $time: String!) {
-  updateExamination(payload: {originalId: $originalId, dataToUpdate: {subject: $subject, description: $description, maximumMarks: $maximumMarks, maxAttempts: $maxAttempts time: $time } }) {
+  mutation UpdateExamination($originalId: ID!, $subject: String!, $description: String, $maxAttempts: String! $time: String!) {
+  updateExamination(payload: {originalId: $originalId, dataToUpdate: {subject: $subject, description: $description, maxAttempts: $maxAttempts time: $time } }) {
     data {
       subject
       originalId
@@ -46,6 +45,7 @@ export const ADD_QUESTIONS = gql`
         originalId
         question
         options
+        marks
       }
       status
       message
