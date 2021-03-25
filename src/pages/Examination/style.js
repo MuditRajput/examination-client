@@ -32,6 +32,7 @@ export const useStyles = makeStyles((theme) => ({
   },
   optionsMargin: {
     margin: '10px 10px 10px 0px',
+    width: '40%',
   },
   flexRow: {
     display: 'flex',
@@ -45,5 +46,14 @@ export const useStyles = makeStyles((theme) => ({
     position: 'absolute',
     right: '85px',
     display: 'inline-block',
+  },
+  instruction: {
+    marginLeft: '8px',
+    fontSize: '12px',
+    color: 'grey',
+  },
+  correctOptionError: {
+    marginLeft: theme.spacing(3),
+    fontSize: '12px',
   },
 }));

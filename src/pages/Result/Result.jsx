@@ -26,7 +26,6 @@ const Results = ({ history }) => {
     if (data.getAllResult.data) {
       const { getAllResult: { data: resultList = [] } = {} } = data;
       results = resultList;
-      console.log(resultList);
       resultList.forEach(({ result }) => {
         let obtainedMarks = 0;
         let totalMarks = 0;

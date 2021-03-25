@@ -6,6 +6,7 @@ import {
 } from '@material-ui/core';
 import CloseIcon from '@material-ui/icons/Close';
 import EditIcon from '@material-ui/icons/Edit';
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { useMutation, useQuery } from '@apollo/client';
 import * as yup from 'yup';
@@ -20,7 +21,7 @@ import { useStyles } from './style';
 
 const AddQuestions = (props) => {
   const { match, history } = props;
-  const [onBlur, setBlur] = useState({});
+  const [onBlur, setBlur] = useState({ correctOption: true });
   const [inputArray] = useState([1]);
   const [optionInputArray, setOptionInputArray] = useState([1, 1]);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -111,7 +112,7 @@ const AddQuestions = (props) => {
 
   const schema = yup.object().shape({
     question: yup.string().required('question is required').min(3, 'should have more then 3 characters'),
-    correctOption: yup.string().required('correct option is required'),
+    correctOption: yup.array().min(1),
     marks: yup.number().required('Marks is required'),
   });
 
@@ -189,13 +190,17 @@ const AddQuestions = (props) => {
     const questionList = [];
     inputArray.forEach((val, index) => {
       const options = [];
+      const correctOption = [];
       optionInputArray.forEach((value, optionIndex) => {
         if (values[`option${index}${optionIndex}`]) {
           options.push(values[`option${index}${optionIndex}`]);
         }
+        if (values[`correctOption${index}${optionIndex}`]) {
+          correctOption.push(values[`option${index}${optionIndex}`]);
+        }
       });
       questionList.push({
-        question: values[`question${index}`], marks: values[`marks${index}`], correctOption: values[`correct${index}`], options,
+        question: values[`question${index}`], marks: values[`marks${index}`], correctOption, options,
       });
     });
     handleValidate(questionList);
@@ -219,6 +224,14 @@ const AddQuestions = (props) => {
       } : {}}
     />
   );
+  const renderRadioField = (input, className) => (
+    <FormControlLabel
+      {...input}
+      className={className}
+      control={<Checkbox color="primary" />}
+    />
+  );
+  console.log(schemaErrors);
 
   const classes = useStyles();
   return (
@@ -249,31 +262,40 @@ const AddQuestions = (props) => {
                           renderTextField(input, classes.margin, 'question', 'Question')
                         )}
                       />
-                      <div className={classes.flexRow}>
-                        <Field
-                          name={`correct${index}`}
-                          render={({ input }) => (
-                            renderTextField(input, '', 'correctOption', 'Correct Option')
-                          )}
-                        />
-                        <Field
-                          name={`marks${index}`}
-                          render={({ input }) => (
-                            renderTextField(input, classes.flexElements, 'marks', 'Marks')
-                          )}
-                        />
-                      </div>
+                      <Field
+                        name={`marks${index}`}
+                        render={({ input }) => (
+                          renderTextField(input, classes.margin, 'marks', 'Marks')
+                        )}
+                      />
+                      <CheckBoxIcon className={classes.instruction} />
+                      <Typography className={classes.instruction} component="i">
+                        Click checkbox to make the option correct option.
+                      </Typography>
                       {
                         optionInputArray.map((arrayValue, optionIndex) => (
-                          <Field
-                            key={`option${index + 1}${optionIndex + 1}`}
-                            name={`option${index}${optionIndex}`}
-                            render={({ input }) => (
-                              renderTextField(input, classes.optionsMargin, '', 'Option', optionIndex)
-                            )}
-                          />
+                          <div key={`option${index + 1}${optionIndex + 1}`}>
+                            <Field
+                              name={`option${index}${optionIndex}`}
+                              render={({ input }) => (
+                                renderTextField(
+                                  input, classes.optionsMargin, '', 'Option', optionIndex,
+                                )
+                              )}
+                            />
+                            <Field
+                              name={`correctOption${index}${optionIndex}`}
+                              type="checkbox"
+                              render={({ input }) => (
+                                renderRadioField(input, classes.margin, 'correctOption')
+                              )}
+                            />
+                          </div>
                         ))
                       }
+                      <Typography align="center" color="secondary" className={classes.correctOptionError}>
+                        {getError('correctOption')}
+                      </Typography>
                     </div>
                   ))
                 }

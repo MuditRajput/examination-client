@@ -99,18 +99,19 @@ const ResultDetail = (props) => {
                     key={`${questionDetail.originalId}${option}`}
                     value={option}
                     control={
-                      (result[questionDetail.originalId][1].length === 1) ? <Radio /> : <Checkbox />
+                      (result[questionDetail.originalId]?.[1].length === 1)
+                        ? <Radio /> : <Checkbox />
                     }
                     label={option}
                   />
                 ))
               }
             </RadioGroup>
-            <Typography key={result[questionDetail.originalId][1]} className={classes.resultOption} component="div" color="primary">
+            <Typography className={classes.resultOption} component="div" color="primary">
               <Typography color="textPrimary" component="i">
                 {'Correct Answer:   '}
               </Typography>
-              {result[questionDetail.originalId][1].map((correct) => ` ${correct} `)}
+              {result[questionDetail.originalId] ? result[questionDetail.originalId][1].map((correct) => ` ${correct} `) : ''}
             </Typography>
           </Paper>
         ))

@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
   TextField, Button, Dialog, DialogContent, DialogActions,
-  DialogTitle,
+  DialogTitle, FormControlLabel, Checkbox, Typography,
 } from '@material-ui/core';
+import CheckBoxIcon from '@material-ui/icons/CheckBox';
 import * as yup from 'yup';
 import { useStyles } from '../../style';
 
@@ -14,11 +15,6 @@ const EditQuestion = (props) => {
   const {
     options: defaultOptions = [], question: defaultQuestion, correctOption = [], marks = 0,
   } = defaultValues;
-
-  let correctOptionString = '';
-  correctOption.forEach((correct) => {
-    correctOptionString = correctOptionString ? `${correctOptionString}|${correct}` : correct;
-  });
 
   const [question, setQuestion] = useState({});
 
@@ -33,7 +29,7 @@ const EditQuestion = (props) => {
   // validation
   const schema = yup.object().shape({
     question: yup.string().required('question is required').min(3, 'should have more then 3 characters'),
-    correctOption: yup.string().required('correct option is required'),
+    correctOption: yup.array().min(1, 'Correct Option is required'),
     marks: yup.number().required('Marks is required'),
   });
 
@@ -66,6 +62,7 @@ const EditQuestion = (props) => {
 
   const handleEditSubmit = () => {
     onSubmit(question);
+    console.log(question);
     handleClose();
   };
 
@@ -91,6 +88,25 @@ const EditQuestion = (props) => {
       ...question, [label]: input.target.value,
     });
   };
+
+  const removeElement = (array, value) => {
+    const index = array.indexOf(value);
+    if (index > -1) {
+      array.splice(index, 1);
+    }
+    return [...array];
+  };
+
+  const handleCheckboxField = (input) => {
+    const { target: { value } } = input;
+    console.log(value);
+    setQuestion({
+      ...question,
+      correctOption: question.correctOption.includes(value)
+        ? removeElement(question.correctOption, value) : [...question.correctOption, value],
+    });
+  };
+
   const handleBlur = (label) => {
     handleValidate();
     setBlur({ ...onBlur, [label]: true });
@@ -98,7 +114,7 @@ const EditQuestion = (props) => {
 
   useEffect(() => {
     setQuestion({
-      defaultQuestion, correctOption, marks, defaultOptions,
+      question: defaultQuestion, correctOption, marks, options: defaultOptions,
     });
     setBlur({
       question: true, correctOption: true, marks: true,
@@ -145,39 +161,39 @@ const EditQuestion = (props) => {
           label="Question"
           variant="outlined"
         />
-        <div className={classes.flexRow}>
-          <TextField
-            size="small"
-            fullWidth
-            defaultValue={correctOptionString}
-            onChange={(input) => handleEditQuestion('correctOption', input)}
-            onBlur={() => handleBlur('correctOption')}
-            label="Correct Option"
-            variant="outlined"
-          />
-          <TextField
-            size="small"
-            fullWidth
-            className={classes.flexElements}
-            defaultValue={marks}
-            onChange={(input) => handleEditQuestion('marks', input)}
-            onBlur={() => handleBlur('marks')}
-            label="Marks"
-            variant="outlined"
-          />
-        </div>
+        <TextField
+          size="small"
+          fullWidth
+          className={classes.margin}
+          defaultValue={marks}
+          onChange={(input) => handleEditQuestion('marks', input)}
+          onBlur={() => handleBlur('marks')}
+          label="Marks"
+          variant="outlined"
+        />
+        <CheckBoxIcon className={classes.instruction} />
+        <Typography className={classes.instruction} component="i">
+          Click checkbox to make the option correct option.
+        </Typography>
         {
           defaultOptionValues.map((option, index) => (
-            <TextField
-              key={option}
-              size="small"
-              defaultValue={option}
-              className={classes.optionsMargin}
-              onBlur={() => handleBlur('option')}
-              onChange={(input) => handleOptionField(`option${index + 1}`, input)}
-              label="Option"
-              variant="outlined"
-            />
+            <div>
+              <TextField
+                key={option}
+                size="small"
+                defaultValue={option}
+                className={classes.optionsMargin}
+                onBlur={() => handleBlur('option')}
+                onChange={(input) => handleOptionField(`option${index + 1}`, input)}
+                label="Option"
+                variant="outlined"
+              />
+              <FormControlLabel
+                value={option}
+                checked={question.correctOption ? question.correctOption.includes(option) : false}
+                control={<Checkbox onClick={handleCheckboxField} color="primary" />}
+              />
+            </div>
           ))
         }
       </DialogContent>
