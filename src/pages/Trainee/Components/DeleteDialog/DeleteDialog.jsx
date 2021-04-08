@@ -19,6 +19,7 @@ const DeleteDialog = (props) => {
 
   return (
     <Dialog
+      data-testid="deleteDialog"
       open={open}
       fullWidth
       onClose={onClose}
@@ -33,10 +34,10 @@ const DeleteDialog = (props) => {
         </DialogContentText>
       </DialogContent>
       <DialogActions className={classes.margin}>
-        <Button autoFocus onClick={onClose} color="primary">
+        <Button data-testid="deleteClose" autoFocus onClick={onClose} color="primary">
           Cancel
         </Button>
-        <Button onClick={onDelete} variant="contained" color="secondary">
+        <Button data-testid="deleteButton" onClick={onDelete} variant="contained" color="secondary">
           Delete
           { loading && <CircularProgress />}
         </Button>

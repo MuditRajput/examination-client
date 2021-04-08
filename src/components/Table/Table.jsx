@@ -31,8 +31,8 @@ const TableComponent = (props) => {
   const classes = useStyles();
 
   return (
-    <TableContainer className={classes.table} component={Paper}>
-      <Table>
+    <TableContainer data-testid="container" className={classes.table} component={Paper}>
+      <Table data-testid="tables">
         <TableHead>
           <TableRow>
             {
@@ -55,7 +55,7 @@ const TableComponent = (props) => {
         </TableHead>
         <TableBody>
           {data.map((trainee, traineeIndex) => (
-            <StyledTableRow key={trainee[id]}>
+            <StyledTableRow data-testid="row" key={trainee[id]}>
               {
                 columns.map((column) => (
                   <TableCell key={`${trainee[id]}${column.field}`} align={column.align} onClick={() => onSelect(trainee[id])}>

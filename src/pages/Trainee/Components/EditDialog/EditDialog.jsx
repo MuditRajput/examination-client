@@ -87,6 +87,7 @@ const EditDialog = (props) => {
 
   return (
     <Dialog
+      data-testid="editDialog"
       open={open}
       fullWidth
       onClose={onClose}
@@ -135,7 +136,7 @@ const EditDialog = (props) => {
         <Button autoFocus onClick={handleClose} color="secondary">
           Cancel
         </Button>
-        <Button disabled={hasErrors() || !isTouched()} onClick={() => handleSubmit(state)} color="primary">
+        <Button data-testid="EditSubmit" disabled={hasErrors() || !isTouched()} onClick={() => handleSubmit(state)} color="primary">
           Submit
           { loading && <CircularProgress />}
         </Button>

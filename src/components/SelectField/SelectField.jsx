@@ -7,7 +7,7 @@ const SelectField = (props) => {
     options, onChange, defaultText, onBlur, error,
   } = props;
   return (
-    <div>
+    <div id="container">
       <Select onChange={onChange} onBlur={onBlur}>
         <option>{defaultText}</option>
         {

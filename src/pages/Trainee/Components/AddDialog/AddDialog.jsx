@@ -99,7 +99,7 @@ const TraineeComponent = (props) => {
       onClose={onClose}
       maxWidth="md"
     >
-      <DialogTitle>
+      <DialogTitle data-testid="dialogText">
         Add Trainee
       </DialogTitle>
       <DialogContent>
@@ -114,7 +114,9 @@ const TraineeComponent = (props) => {
           className={classes.margin}
           onChange={(input) => handleInputField('name', input)}
           onBlur={() => handleBlur('name')}
+          data-testid="Name"
           label="Name"
+          name="Name"
           id="outlined-start-adornment"
           InputProps={{
             startAdornment: <InputAdornment position="start"><AccountCircleIcon opacity="0.6" /></InputAdornment>,
@@ -124,6 +126,7 @@ const TraineeComponent = (props) => {
         <TextField
           required
           fullWidth
+          name="Email"
           error={!!getError('email')}
           helperText={getError('email')}
           className={classes.margin}
@@ -139,7 +142,8 @@ const TraineeComponent = (props) => {
           <TextField
             required
             fullWidth
-            type="password"
+            type="text"
+            name="Password"
             error={!!getError('password')}
             helperText={getError('password')}
             onChange={(input) => handleInputField('password', input)}
@@ -153,7 +157,8 @@ const TraineeComponent = (props) => {
           <TextField
             required
             fullWidth
-            type="password"
+            type="text"
+            name="Confirm Password"
             error={!!getError('confirm')}
             helperText={getError('confirm')}
             className={classes.flexElements}
@@ -171,7 +176,7 @@ const TraineeComponent = (props) => {
         <Button autoFocus onClick={onClose} color="secondary">
           Cancel
         </Button>
-        <Button disabled={hasErrors() || !isTouched() || loading} onClick={() => handleOnSubmit(state)} color="primary">
+        <Button data-testid="addSubmit" disabled={hasErrors() || !isTouched() || loading} onClick={() => handleOnSubmit(state)} color="primary">
           Submit
           { loading && <CircularProgress />}
         </Button>

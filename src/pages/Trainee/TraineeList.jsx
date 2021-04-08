@@ -44,6 +44,7 @@ const TraineeList = (props) => {
       const {
         getAllTrainees: { data: { UsersList = [], totalCount = 0 } = {} } = {},
       } = data;
+      console.log(UsersList);
       trainees = UsersList;
       traineeCount = totalCount;
     } catch {
@@ -233,10 +234,11 @@ const TraineeList = (props) => {
       {({ openSnackbar }) => (
         <>
           <CssBaseline />
-          <Button size="large" variant="outlined" color="primary" onClick={handleOpenAddTrainee}>
+          <Button data-testid="addButton" size="large" variant="outlined" color="primary" onClick={handleOpenAddTrainee}>
             Add Trainee
           </Button>
           <EnhancedTable
+            data-testid="table"
             id="originalId"
             data={trainees}
             loader={getAllTraineeLoading}
