@@ -8,14 +8,16 @@ import { SnackBarProvider } from '../../contexts';
 import { TraineeList } from '.';
 import apolloClient from '../../lib/apollo-client';
 
-beforeEach(() => {
-  render(
-    <ApolloProvider client={apolloClient}>
-      <SnackBarProvider>
-        <TraineeList match={{ path: 'trainee' }} history={{ push: '' }} />
-      </SnackBarProvider>
-    </ApolloProvider>,
-  );
+beforeEach(async () => {
+  await waitFor(() => {
+    render(
+      <ApolloProvider client={apolloClient}>
+        <SnackBarProvider>
+          <TraineeList match={{ path: 'trainee' }} history={{ push: '' }} />
+        </SnackBarProvider>
+      </ApolloProvider>,
+    );
+  });
 });
 afterEach(cleanup);
 
@@ -52,6 +54,8 @@ describe('Rendering', () => {
     fireEvent.change(screen.getByRole('textbox', { name: 'Password' }), { target: { value: 'Qwerty@1' } });
     fireEvent.change(screen.getByRole('textbox', { name: 'Confirm Password' }), { target: { value: 'Qwerty1' } });
     const element = screen.getByTestId('addSubmit');
-    expect(element).toHaveProperty('disabled', true);
+    await waitFor(() => {
+      expect(element).toHaveProperty('disabled', true);
+    });
   });
 });

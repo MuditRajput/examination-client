@@ -62,7 +62,6 @@ const EditQuestion = (props) => {
 
   const handleEditSubmit = () => {
     onSubmit(question);
-    console.log(question);
     handleClose();
   };
 
@@ -99,7 +98,6 @@ const EditQuestion = (props) => {
 
   const handleCheckboxField = (input) => {
     const { target: { value } } = input;
-    console.log(value);
     setQuestion({
       ...question,
       correctOption: question.correctOption.includes(value)
@@ -146,7 +144,7 @@ const EditQuestion = (props) => {
       maxWidth="md"
     >
       <DialogContent>
-        <DialogTitle>
+        <DialogTitle data-testid="dialogText">
           Edit Question
         </DialogTitle>
         <TextField
@@ -154,10 +152,11 @@ const EditQuestion = (props) => {
           fullWidth
           className={classes.margin}
           defaultValue={defaultQuestion}
-          error={!!getError('subject')}
-          helperText={getError('subject')}
+          error={!!getError('question')}
+          helperText={getError('question')}
           onChange={(input) => handleEditQuestion('question', input)}
           onBlur={() => { handleBlur('question'); }}
+          id="Question"
           label="Question"
           variant="outlined"
         />
@@ -168,6 +167,7 @@ const EditQuestion = (props) => {
           defaultValue={marks}
           onChange={(input) => handleEditQuestion('marks', input)}
           onBlur={() => handleBlur('marks')}
+          id="marks"
           label="Marks"
           variant="outlined"
         />
@@ -177,14 +177,14 @@ const EditQuestion = (props) => {
         </Typography>
         {
           defaultOptionValues.map((option, index) => (
-            <div>
+            <div key={`option${index + 1}`}>
               <TextField
-                key={option}
                 size="small"
                 defaultValue={option}
                 className={classes.optionsMargin}
                 onBlur={() => handleBlur('option')}
                 onChange={(input) => handleOptionField(`option${index + 1}`, input)}
+                id={option}
                 label="Option"
                 variant="outlined"
               />
@@ -204,7 +204,7 @@ const EditQuestion = (props) => {
         <Button autoFocus onClick={handleClose} color="secondary">
           Close
         </Button>
-        <Button disabled={hasErrors() || !isTouched()} onClick={handleEditSubmit} color="primary">
+        <Button data-testid="editSubmit" disabled={hasErrors() || !isTouched()} onClick={handleEditSubmit} color="primary">
           Submit
         </Button>
       </DialogActions>

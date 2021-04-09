@@ -108,7 +108,7 @@ const AddExamination = (props) => {
           onChange={(input) => handleInputField('subject', input)}
           onBlur={() => handleBlur('subject')}
           label="Subject"
-          id="outlined-start-adornment"
+          id="Subject"
           variant="outlined"
         />
         <TextField
@@ -119,12 +119,12 @@ const AddExamination = (props) => {
           className={classes.margin}
           onChange={(input) => handleInputField('description', input)}
           onBlur={() => handleBlur('description')}
+          id="Description"
           label="Description"
           variant="outlined"
         />
         <div className={classes.flexRow}>
           <TextField
-            id="outlined-number"
             type="number"
             variant="outlined"
             size="small"
@@ -133,14 +133,15 @@ const AddExamination = (props) => {
             helperText={getError('time')}
             onChange={(input) => handleInputField('time', input)}
             onBlur={() => handleBlur('time')}
+            id="Time"
             label="Time (in minutes)"
           />
           <TextField
-            id="outlined-number"
             type="number"
             variant="outlined"
             size="small"
             fullWidth
+            id="Attempts"
             error={!!getError('maxAttempts')}
             helperText={getError('maxAttempts')}
             className={classes.flexElements}

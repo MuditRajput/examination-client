@@ -114,7 +114,7 @@ const EditExamination = (props) => {
           onChange={(input) => handleInputField('subject', input)}
           onBlur={() => handleBlur('subject')}
           label="Subject"
-          id="outlined-start-adornment"
+          id="Subject"
           variant="outlined"
         />
         <TextField
@@ -126,12 +126,13 @@ const EditExamination = (props) => {
           className={classes.margin}
           onChange={(input) => handleInputField('description', input)}
           onBlur={() => handleBlur('description')}
+          id="Description"
           label="Description"
           variant="outlined"
         />
         <div className={classes.flexRow}>
           <TextField
-            id="outlined-number"
+            id="Time"
             type="number"
             variant="outlined"
             size="small"
@@ -144,7 +145,7 @@ const EditExamination = (props) => {
             label="Time (in minutes)"
           />
           <TextField
-            id="outlined-number"
+            id="Attempts"
             type="number"
             variant="outlined"
             size="small"
@@ -163,7 +164,7 @@ const EditExamination = (props) => {
         <Button autoFocus onClick={handleOnClose} color="secondary">
           Cancel
         </Button>
-        <Button data-testId="editSubmit" disabled={hasErrors() || !isTouched() || loading} onClick={() => handleOnSubmit(state)} color="primary">
+        <Button data-testid="editSubmit" disabled={hasErrors() || !isTouched() || loading} onClick={() => handleOnSubmit(state)} color="primary">
           Submit
           { loading && <CircularProgress />}
         </Button>
