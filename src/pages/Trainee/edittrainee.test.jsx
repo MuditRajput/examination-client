@@ -3,7 +3,7 @@ import {
   render, cleanup, screen, fireEvent,
 } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import { EditDialog } from './pages/Trainee/Components/EditDialog';
+import { EditDialog } from './Components/EditDialog';
 
 const defaultValues = {
   email: 'email@successive.tech',
@@ -26,7 +26,7 @@ describe('Edit Dialog', () => {
     const element = screen.getByTestId('EditSubmit');
     expect(element).toHaveProperty('disabled', true);
   });
-  test('submit button enabled when correct inputs', async () => {
+  test('submit button enabled when correct inputs', () => {
     fireEvent.click(screen.getByTestId('EditSubmit'));
     const element = screen.getByTestId('EditSubmit');
     expect(element).toHaveProperty('disabled', true);

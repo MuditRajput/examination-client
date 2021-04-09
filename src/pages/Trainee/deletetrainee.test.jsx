@@ -3,7 +3,7 @@ import {
   render, cleanup, screen, fireEvent,
 } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
-import { DeleteDialog } from './pages/Trainee/Components/DeleteDialog';
+import { DeleteDialog } from './Components/DeleteDialog';
 
 beforeEach(() => {
   render(

@@ -114,10 +114,8 @@ const TraineeComponent = (props) => {
           className={classes.margin}
           onChange={(input) => handleInputField('name', input)}
           onBlur={() => handleBlur('name')}
-          data-testid="Name"
+          id="Name"
           label="Name"
-          name="Name"
-          id="outlined-start-adornment"
           InputProps={{
             startAdornment: <InputAdornment position="start"><AccountCircleIcon opacity="0.6" /></InputAdornment>,
           }}
@@ -126,13 +124,14 @@ const TraineeComponent = (props) => {
         <TextField
           required
           fullWidth
-          name="Email"
           error={!!getError('email')}
           helperText={getError('email')}
           className={classes.margin}
           onChange={(input) => handleInputField('email', input)}
           onBlur={() => handleBlur('email')}
           label="Email"
+          data-testid="Email"
+          id="Email"
           InputProps={{
             startAdornment: <InputAdornment position="start"><EmailIcon opacity="0.6" /></InputAdornment>,
           }}
@@ -143,12 +142,12 @@ const TraineeComponent = (props) => {
             required
             fullWidth
             type="text"
-            name="Password"
             error={!!getError('password')}
             helperText={getError('password')}
             onChange={(input) => handleInputField('password', input)}
             onBlur={() => handleBlur('password')}
             label="Password"
+            id="Password"
             InputProps={{
               startAdornment: <InputAdornment position="start"><VisibilityOffIcon opacity="0.6" /></InputAdornment>,
             }}
@@ -158,13 +157,13 @@ const TraineeComponent = (props) => {
             required
             fullWidth
             type="text"
-            name="Confirm Password"
             error={!!getError('confirm')}
             helperText={getError('confirm')}
             className={classes.flexElements}
             onChange={(input) => handleInputField('confirm', input)}
             onBlur={() => handleBlur('confirm')}
             label="Confirm Password"
+            id="Confirm"
             InputProps={{
               startAdornment: <InputAdornment position="start"><VisibilityOffIcon opacity="0.6" /></InputAdornment>,
             }}

@@ -96,8 +96,8 @@ const EditExamination = (props) => {
       onClose={onClose}
       maxWidth="md"
     >
-      <DialogTitle>
-        Add Examination
+      <DialogTitle data-testid="dialogText">
+        Edit Examination
       </DialogTitle>
       <DialogContent>
         <DialogContentText fontSize={16}>
@@ -163,7 +163,7 @@ const EditExamination = (props) => {
         <Button autoFocus onClick={handleOnClose} color="secondary">
           Cancel
         </Button>
-        <Button disabled={hasErrors() || !isTouched() || loading} onClick={() => handleOnSubmit(state)} color="primary">
+        <Button data-testId="editSubmit" disabled={hasErrors() || !isTouched() || loading} onClick={() => handleOnSubmit(state)} color="primary">
           Submit
           { loading && <CircularProgress />}
         </Button>
