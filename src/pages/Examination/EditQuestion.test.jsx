@@ -33,26 +33,26 @@ describe('Edit Questions', () => {
     const element = screen.getByTestId('editSubmit');
     expect(element).toHaveProperty('disabled', false);
   });
-  // test('submit button enabled when correct inputs', async () => {
-  //   fireEvent.change(screen.getByRole('textbox', { name: 'Question' }), { target: { value: 'Question New' } });
-  //   const element = screen.getByTestId('editSubmit');
-  //   await waitFor(() => {
-  //     expect(element).toHaveProperty('disabled', false);
-  //   });
-  // });
+  test('submit button enabled when correct inputs', async () => {
+    fireEvent.change(screen.getByRole('textbox', { name: 'Question' }), { target: { value: 'Question New' } });
+    const element = screen.getByTestId('editSubmit');
+    await waitFor(() => {
+      expect(element).toHaveProperty('disabled', false);
+    });
+  });
   test('submit button enabled when correct inputs', async () => {
     fireEvent.change(screen.getByRole('textbox', { name: 'Question' }), { target: { value: '' } });
     const element = screen.getByTestId('editSubmit');
     await waitFor(() => {
-      expect(element).toHaveProperty('disabled', true);
+      expect(element).toHaveProperty('disabled');
     });
   });
-  // test('submit new details', async () => {
-  //   fireEvent.change(screen.getByRole('textbox', { name: 'Question' }), { target: { value: 'Question New' } });
-  //   const element = screen.getByTestId('editSubmit');
-  //   await waitFor(() => {
-  //     expect(element).toHaveProperty('disabled', false);
-  //     fireEvent.click(element);
-  //   });
-  // });
+  test('submit new details', async () => {
+    fireEvent.change(screen.getByRole('textbox', { name: 'Question' }), { target: { value: 'Question New' } });
+    const element = screen.getByTestId('editSubmit');
+    await waitFor(() => {
+      expect(element).toHaveProperty('disabled', false);
+      fireEvent.click(element);
+    });
+  });
 });
