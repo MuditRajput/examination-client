@@ -39,6 +39,7 @@ const Results = ({ history }) => {
       });
     }
   }
+  console.log('here');
 
   const goToDetail = (id) => {
     history.push(`/results/${id}`);
@@ -47,12 +48,12 @@ const Results = ({ history }) => {
   const getDateFormatted = (date) => moment(date).format('dddd, MMMM Do yyyy, hh:mm:ss a');
   return (
     <>
-      <Typography variant="h5" color="primary" gutterBottom>
+      <Typography data-testid="recentTitle" variant="h5" color="primary" gutterBottom>
         Recent Exams
       </Typography>
       <TableContainer className={classes.table} component={Paper}>
         <Table>
-          <TableHead>
+          <TableHead data-testid="tableHead">
             <TableRow>
               <TableCell>
                 <Typography>

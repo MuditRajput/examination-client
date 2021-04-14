@@ -31,7 +31,7 @@ describe('Edit Questions', () => {
   });
   test('passed if submit button is disabled initially', () => {
     const element = screen.getByTestId('editSubmit');
-    expect(element).toHaveProperty('disabled', false);
+    expect(element).toHaveProperty('disabled', true);
   });
   test('submit button enabled when correct inputs', async () => {
     fireEvent.change(screen.getByRole('textbox', { name: 'Question' }), { target: { value: 'Question New' } });

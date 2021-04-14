@@ -66,7 +66,7 @@ const ResultDetail = (props) => {
 
   if (loading || getQuestionLoading) {
     return (
-      <Typography component="div" align="center">
+      <Typography data-testid="progress" component="div" align="center">
         <CircularProgress />
       </Typography>
     );
@@ -76,7 +76,7 @@ const ResultDetail = (props) => {
   }
 
   return (
-    <Container>
+    <Container data-testid="container">
       <Typography align="right" variant="h4">
         Marks Obtained:
         {obtainedMarks}
