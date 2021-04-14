@@ -106,9 +106,12 @@ const EditQuestion = (props) => {
   };
 
   const handleBlur = (label) => {
-    handleValidate();
     setBlur({ ...onBlur, [label]: true });
   };
+
+  useEffect(() => {
+    handleValidate();
+  }, [question]);
 
   useEffect(() => {
     setQuestion({

@@ -44,7 +44,6 @@ const TraineeList = (props) => {
       const {
         getAllTrainees: { data: { UsersList = [], totalCount = 0 } = {} } = {},
       } = data;
-      console.log(UsersList);
       trainees = UsersList;
       traineeCount = totalCount;
     } catch {

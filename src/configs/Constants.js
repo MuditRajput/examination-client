@@ -47,3 +47,9 @@ export const instructions = [
   'Exam will auto submit when allotted time is over.',
   'Limited attempts are allowed per user',
 ];
+
+export const payLoad = {
+  iss: 'Successive Technologies',
+  aud: 'www.successive.in',
+  sub: 'Learn and Implement',
+};

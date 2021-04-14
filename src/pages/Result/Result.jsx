@@ -31,7 +31,6 @@ const Results = ({ history }) => {
         let totalMarks = 0;
         Object.values(result).forEach((resultValue) => {
           obtainedMarks += Number(resultValue[0]);
-          console.log(resultValue);
           totalMarks += Number(resultValue[3]);
         });
         marks.push(obtainedMarks);

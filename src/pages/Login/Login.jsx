@@ -1,4 +1,3 @@
-/* eslint-disable no-shadow */
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
@@ -8,9 +7,11 @@ import EmailIcon from '@material-ui/icons/Email';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import VisibilityOffIcon from '@material-ui/icons/VisibilityOff';
 import { useMutation } from '@apollo/client';
+import { GoogleLogin } from 'react-google-login';
+import * as jwt from 'jsonwebtoken';
 import * as yup from 'yup';
-// import { callApi } from '../../lib/utils';
 import { SnackbarContext } from '../../contexts';
+import { payLoad } from '../../configs/Constants';
 import { LOGIN_USER } from './mutation';
 
 export const useStyle = makeStyles((theme) => ({
@@ -32,7 +33,7 @@ export const useStyle = makeStyles((theme) => ({
     margin: '20px',
   },
   buttonLogin: {
-    marginTop: '25px',
+    margin: '20px 0',
   },
   buttonProgress: {
     position: 'absolute',
@@ -126,6 +127,19 @@ const LoginUi = (props) => {
     handleCallApi(openSnackbar);
   };
 
+  const responseGoogle = (response, openSnackbar) => {
+    try {
+      const { profileObj: { email } } = response;
+      const newPayLoad = { ...payLoad, email };
+      const tokenGenerated = jwt.sign(newPayLoad, process.env.REACT_APP_SECRET_KEY, { expiresIn: '1y' });
+      localStorage.setItem('token', tokenGenerated);
+      openSnackbar('success', 'login succesfull');
+      history.push('/');
+    } catch {
+      openSnackbar('error', 'Something Went Wrong');
+    }
+  };
+
   return (
     <SnackbarContext.Consumer>
       {({ openSnackbar }) => (
@@ -173,12 +187,19 @@ const LoginUi = (props) => {
                 Login
                 { loading && <CircularProgress size={24} className={classes.buttonProgress} /> }
               </Button>
+              <GoogleLogin
+                clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
+                className={classes.margin}
+                buttonText="Log in with Google"
+                onSuccess={(input) => responseGoogle(input, openSnackbar)}
+                onFailure={responseGoogle}
+                cookiePolicy="single_host_origin"
+              />
             </form>
           </div>
         </Container>
       )}
     </SnackbarContext.Consumer>
-
   );
 };
 

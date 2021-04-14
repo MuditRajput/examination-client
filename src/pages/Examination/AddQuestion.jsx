@@ -231,7 +231,6 @@ const AddQuestions = (props) => {
       control={<Checkbox color="primary" />}
     />
   );
-  console.log(schemaErrors);
 
   const classes = useStyles();
   return (
