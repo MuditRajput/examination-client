@@ -127,6 +127,7 @@ const InputDemo = () => {
       />
       <Button
         value="Submit"
+        id="submitButton"
         onClick={onSubmit}
         disabled={!isTouched() || hasErrors()}
         colored={!(!isTouched() || hasErrors())}

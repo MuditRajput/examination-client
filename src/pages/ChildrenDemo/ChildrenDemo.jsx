@@ -7,7 +7,7 @@ const ChildrenDemo = () => (
     <Math first={1} second={0} operator="+">
       {
         (first, second, result) => (
-          <p>
+          <p data-testid="childFirst">
             {`Sum of ${first} and ${second} is ${result}`}
           </p>
         )
@@ -16,7 +16,7 @@ const ChildrenDemo = () => (
     <Math first={1} second={0} operator="/">
       {
         (first, second, result) => (
-          <Typography>
+          <Typography data-testid="childSecond">
             {`When we divide ${first} with ${second} then result is ${result}`}
           </Typography>
         )

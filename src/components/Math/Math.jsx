@@ -19,7 +19,7 @@ const MathFunction = (props) => {
     return children(first, second, getResult(first, second, operator));
   }
   return (
-    <p>
+    <p data-testid="template">
       {`Result of ${first} ${operator} ${second} is ${getResult(first, second, operator)}`}
     </p>
   );

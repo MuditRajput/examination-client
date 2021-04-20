@@ -9,7 +9,7 @@ const TextField = (props) => {
   return (
     <>
       <Input type="text" defaultValue={defaultValue} disabled={disabled} onChange={onChange} error={error} onBlur={onBlur} />
-      <P>{error}</P>
+      <P data-testid="error">{error}</P>
     </>
   );
 };

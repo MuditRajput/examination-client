@@ -223,7 +223,7 @@ const Examination = (props) => {
     <SnackbarContext.Consumer>
       {({ openSnackbar }) => (
         <>
-          <Button size="large" variant="outlined" color="primary" onClick={handleOpenAddExamination}>
+          <Button data-testid="addButton" size="large" variant="outlined" color="primary" onClick={handleOpenAddExamination}>
             Add Examination
           </Button>
           <EnhancedTable
