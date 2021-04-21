@@ -18,7 +18,7 @@ const Timer = (props) => {
   return (
     <Typography align="right">
       <TimerIcon style={{ fontSize: '24px' }} />
-      <Typography style={{ display: 'inlineblock', marginBottom: '10px' }} component="span" variant="h4">
+      <Typography data-testid="timer" style={{ display: 'inlineblock', marginBottom: '10px' }} component="span" variant="h4">
         {hours}
         :
         {minutes}
